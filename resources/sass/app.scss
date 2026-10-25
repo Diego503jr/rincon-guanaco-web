@@ -1,0 +1,29 @@
+@import "bootstrap/scss/functions";
+
+// ===== Colores de la guía =====
+$primary: #0D2A4D; // Azul Añil Profundo
+$accent:  #F26419; // Naranja Atardecer
+$success: #2A9D8F; // Verde Palmera
+$body-bg: #F8F9FA; // Blanco Hueso
+$body-color: #212529; // Gris Carbón
+
+$min-contrast-ratio: 3; // texto blanco legible sobre naranja y verde
+$link-color: $primary;
+$link-hover-color: $accent;
+
+// ===== Fuentes de la guía =====
+$font-family-sans-serif: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-size-base: 0.875rem; // 14px
+$font-weight-base: 400;
+
+$headings-font-family: 'Poppins', sans-serif;
+$headings-font-weight: 600;
+$headings-color: $primary;
+$h1-font-size: 1.5rem; // 24px
+
+// Agrega "accent" (naranja) para usar btn-accent, bg-accent, etc.
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+$theme-colors: map-merge($theme-colors, ("accent": $accent));
+
+@import "bootstrap/scss/bootstrap";
