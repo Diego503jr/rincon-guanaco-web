@@ -1,10 +1,10 @@
 @import "bootstrap/scss/functions";
 
 // ===== Colores de la guía =====
-$primary: #0D2A4D; // Azul Añil Profundo
-$accent:  #F26419; // Naranja Atardecer
-$success: #2A9D8F; // Verde Palmera
-$body-bg: #F8F9FA; // Blanco Hueso
+$primary: #0d2a4d; // Azul Añil Profundo
+$accent: #f26419; // Naranja Atardecer
+$success: #2a9d8f; // Verde Palmera
+$body-bg: #f8f9fa; // Blanco Hueso
 $body-color: #212529; // Gris Carbón
 
 $min-contrast-ratio: 3; // texto blanco legible sobre naranja y verde
@@ -12,11 +12,16 @@ $link-color: $primary;
 $link-hover-color: $accent;
 
 // ===== Fuentes de la guía =====
-$font-family-sans-serif: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-family-sans-serif:
+    "Inter",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
 $font-size-base: 0.875rem; // 14px
 $font-weight-base: 400;
 
-$headings-font-family: 'Poppins', sans-serif;
+$headings-font-family: "Poppins", sans-serif;
 $headings-font-weight: 600;
 $headings-color: $primary;
 $h1-font-size: 1.5rem; // 24px
@@ -24,6 +29,54 @@ $h1-font-size: 1.5rem; // 24px
 // Agrega "accent" (naranja) para usar btn-accent, bg-accent, etc.
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
-$theme-colors: map-merge($theme-colors, ("accent": $accent));
+$theme-colors: map-merge(
+    $theme-colors,
+    (
+        "accent": $accent,
+    )
+);
 
 @import "bootstrap/scss/bootstrap";
+
+// ===== Login =====
+.auth-hero {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+// ===== Layout admin =====
+.sidebar {
+    --bs-offcanvas-width: 260px; // ancho del menú en móvil
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        border-left: 4px solid transparent;
+        border-radius: 0.375rem;
+
+        &:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        &.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: $accent;
+        }
+    }
+}
+
+@media (min-width: 992px) {
+    .sidebar {
+        flex: 0 0 260px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+}
