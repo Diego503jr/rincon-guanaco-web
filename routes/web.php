@@ -2,12 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('login'));
+Route::view('/', 'auth.gate')->name('gate');
 
 // Login
 Route::view('/login', 'auth.login')->name('login');
-Route::post('/login', fn () => redirect()->route('admin.dashboard'))->name('login.store'); // temporal
-Route::post('/logout', fn () => redirect()->route('login'))->name('logout');               // temporal
+Route::post('/login', fn() => redirect()->route('admin.dashboard'))->name('login.store'); // temporal
+// Route::post('/logout', fn() => redirect()->route('login'))->name('logout');               // temporal
 
 // Panel
 Route::prefix('admin')->name('admin.')->group(function () {
