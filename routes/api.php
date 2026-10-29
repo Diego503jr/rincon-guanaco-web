@@ -15,6 +15,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     //Reviews
-    Route::get('/admin/reports', [ModerationController::class, 'getReports']);
-    Route::patch('/admin/reports/{id}/status', [ModerationController::class, 'updateStatus']);
+    Route::get('/admin/reports', [ModerationController::class, 'getReports']); //Listar reportes activos
+    Route::patch('/admin/reports/{id}/status', [ModerationController::class, 'updateStatus']); //Eliminado lógico
+    Route::delete('/admin/reports/{id}', [ModerationController::class, 'destroyReport']); //Eliminado físico
 });

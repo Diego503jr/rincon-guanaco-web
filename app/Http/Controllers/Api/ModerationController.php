@@ -32,4 +32,13 @@ class ModerationController extends Controller
 
         return response()->json(['message' => 'Estado actualizado correctamente.']);
     }
+
+    public function destroyReport($id)
+    {
+        // Buscamos el reporte específico y lo eliminamos físicamente
+        $report = \App\Models\ReportReview::findOrFail($id);
+        $report->delete();
+
+        return response()->json(['message' => 'Reporte eliminado físicamente.']);
+    }
 }

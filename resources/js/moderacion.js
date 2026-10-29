@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                             <button type="button" class="btn bg-secondary text-primary fw-medium border px-3 btn-discard" data-id="${report.id}">
                                 Descartar reporte
                             </button>
-                            <button type="button" class="btn text-white fw-medium px-3 bg-accent">
-                                Eliminar reseña
+                            <button type="button" class="btn btn-accent text-white fw-medium px-3 btn-delete-report" data-id="${report.id}">
+                                Eliminar reporte
                             </button>
                         </div>
                     </div>
@@ -136,13 +136,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         renderReports();
     });
 
-    //Lógica para descartar reporte
+    // Lógica para botones de la tarjeta (Descartar y Eliminar)
     document.addEventListener('click', function (e) {
-        const discardBtn = e.target.closest('.btn-discard');
 
+        // --- LÓGICA: DESCARTAR REPORTE (Cambio de estado) ---
+        const discardBtn = e.target.closest('.btn-discard');
         if (discardBtn) {
             e.preventDefault();
-
             const reportId = discardBtn.getAttribute('data-id');
 
             Swal.fire({
@@ -155,70 +155,85 @@ document.addEventListener('DOMContentLoaded', async function () {
                 confirmButtonText: 'Sí, descartar',
                 cancelButtonText: 'Cancelar'
             }).then(async (result) => {
-
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Procesando...',
-                        text: 'Actualizando la base de datos.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
+                    Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
                     try {
                         const res = await window.api(`/admin/reports/${reportId}/status`, {
                             method: 'PATCH',
-                            body: JSON.stringify({
-                                status: 'inactivo'
-                            })
+                            body: JSON.stringify({ status: 'inactivo' })
+                        });
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        removeFromView(reportId);
+
+                        Swal.fire({ icon: 'success', title: '¡Descartado!', showConfirmButton: false, timer: 1500 });
+                    } catch (error) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+                    }
+                }
+            });
+        }
+
+        // --- LÓGICA: ELIMINAR REPORTE FÍSICAMENTE ---
+        const deleteBtn = e.target.closest('.btn-delete-report');
+        if (deleteBtn) {
+            e.preventDefault();
+            const reportId = deleteBtn.getAttribute('data-id');
+
+            Swal.fire({
+                title: '¿Eliminar reporte permanentemente?',
+                text: "Esta acción borrará completamente el reporte de la base de datos. La reseña original no será afectada.",
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Eliminando...', text: 'Borrando registro...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                    try {
+                        // Petición DELETE directa al ID del reporte
+                        const res = await window.api(`/admin/reports/${reportId}`, {
+                            method: 'DELETE'
                         });
 
                         if (!res.ok) {
                             const errorData = await res.json().catch(() => ({}));
-                            const errorMsg = errorData.message || res.statusText || 'Error desconocido del servidor';
+                            const errorMsg = errorData.message || res.statusText || 'Error desconocido';
                             throw new Error(`HTTP ${res.status}: ${errorMsg}`);
                         }
 
                         await new Promise(resolve => setTimeout(resolve, 500));
+                        removeFromView(reportId);
 
-                        // Actualizar vista en memoria
-                        allReports = allReports.filter(r => r.id != reportId);
-
-                        const filter = searchInput.value.toLowerCase();
-                        filteredReports = allReports.filter(report => {
-                            const name = report.review && report.review.user ? report.review.user.name.toLowerCase() : '';
-                            const reviewComment = (report.review && report.review.comment) ? report.review.comment.toLowerCase() : 'sin comentario de texto.';
-                            const reportReason = (report.nota || report.type_report || '').toLowerCase();
-                            return name.includes(filter) || reviewComment.includes(filter) || reportReason.includes(filter);
-                        });
-
-                        const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
-                        if (currentPage > totalPages && totalPages > 0) {
-                            currentPage = totalPages;
-                        }
-
-                        renderReports();
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Descartado!',
-                            text: 'El reporte fue descartado correctamente.',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
+                        Swal.fire({ icon: 'success', title: '¡Eliminado!', text: 'El reporte fue borrado completamente.', showConfirmButton: false, timer: 1500 });
                     } catch (error) {
-                        console.error('Error detallado:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error detectado',
-                            text: error.message
-                        });
+                        Swal.fire({ icon: 'error', title: 'Error al eliminar', text: error.message });
                     }
                 }
             });
         }
     });
+
+    // Función auxiliar para actualizar la memoria y la vista (reutilizable)
+    function removeFromView(reportId) {
+        allReports = allReports.filter(r => r.id != reportId);
+
+        const filter = searchInput.value.toLowerCase();
+        filteredReports = allReports.filter(report => {
+            const name = report.review && report.review.user ? report.review.user.name.toLowerCase() : '';
+            const reviewComment = (report.review && report.review.comment) ? report.review.comment.toLowerCase() : '';
+            const reportReason = (report.nota || report.type_report || '').toLowerCase();
+            return name.includes(filter) || reviewComment.includes(filter) || reportReason.includes(filter);
+        });
+
+        const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+        renderReports();
+    }
 
 });
