@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ModerationController;
+use App\Http\Controllers\Api\DashboardController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -18,4 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/reports', [ModerationController::class, 'getReports']); //Listar reportes activos
     Route::patch('/admin/reports/{id}/status', [ModerationController::class, 'updateStatus']); //Eliminado lógico
     Route::delete('/admin/reports/{id}', [ModerationController::class, 'destroyReport']); //Eliminado físico
+
+    //Dashboard
+    Route::get('/admin/dashboard', [DashboardController::class, 'stats']); //Contadores y datos de gráficos
 });
