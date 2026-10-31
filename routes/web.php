@@ -27,6 +27,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::view('/reportes', 'admin.reports.index')->name('reports.index');
 
     Route::view('/users', 'admin.users.index')->name('users.index');
-    Route::view('/users/crear', 'admin.users.crear')->name('users.crear');
+    Route::view('/users/create', 'admin.users.create')->name('users.create');
     Route::view('/users/{id}/editar', 'admin.users.edit')->name('users.edit');
 });
