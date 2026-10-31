@@ -19,8 +19,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::view('/destinos/crear', 'admin.destinations.create')->name('destinations.create');
     Route::view('/destinos/{id}/editar', 'admin.destinations.edit')->name('destinations.edit');
 
-    // Moderación y reportes
+    // Moderación
     Route::view('/moderacion', 'admin.moderation.index')->name('moderation.index');
     Route::view('/moderacion/{id}/editar', 'admin.moderation.edit')->name('moderation.edit');
+
+    // Reportes
     Route::view('/reportes', 'admin.reports.index')->name('reports.index');
+
+    Route::view('/users', 'admin.users.index')->name('users.index');
+    Route::view('/users/crear', 'admin.users.crear')->name('users.crear');
+    Route::view('/users/{id}/editar', 'admin.users.edit')->name('users.edit');
 });

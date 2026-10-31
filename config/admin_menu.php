@@ -5,4 +5,5 @@ return [
     ['label' => 'Gestión Turística',    'icon' => 'bi-geo-alt',           'route' => 'admin.destinations.index', 'active' => 'admin.destinations.*'],
     ['label' => 'Moderación de Foro',   'icon' => 'bi-chat',              'route' => 'admin.moderation.index',   'active' => 'admin.moderation.*'],
     ['label' => 'Reportes y Descargas', 'icon' => 'bi-file-earmark-text', 'route' => 'admin.reports.index',      'active' => 'admin.reports.*'],
+    ['label' => 'Gestion de Usuarios', 'icon' => 'bi-person', 'route' => 'admin.users.index', 'active' => 'admin.users.*'],
 ];
