@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ItineraryController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -38,10 +39,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/pdf-reports', [ReportController::class, 'pdf']); //Generar reporte PDF (?type=&from=&to=)
     
     //Actividades
-    Route::get('/admin/activities', [ActivityController::class, 'index']); //Listar actividades con su destino
-    Route::post('/admin/activities', [ActivityController::class, 'store']); //Crear actividad
-    Route::put('/admin/activities/{id}', [ActivityController::class, 'update']); //Editar actividad
+    Route::get('/admin/activities', [ActivityController::class, 'index']); 
+    Route::post('/admin/activities', [ActivityController::class, 'store']); 
+    Route::put('/admin/activities/{id}', [ActivityController::class, 'update']); 
     Route::delete('/admin/activities/{id}', [ActivityController::class, 'destroy']); //Eliminado lógico
+
+    
+    //Itinerarios (app móvil: cada usuario solo ve los suyos)
+    Route::get('/itineraries', [ItineraryController::class, 'index']); 
+    Route::post('/itineraries', [ItineraryController::class, 'store']); 
+    Route::get('/itineraries/{id}', [ItineraryController::class, 'show']); 
+    Route::patch('/itineraries/{id}', [ItineraryController::class, 'update']);
+    Route::delete('/itineraries/{id}', [ItineraryController::class, 'destroy']); 
 
     // Usuarios
     Route::get('/admin/users', [UserController::class, 'index']);

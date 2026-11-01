@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Itinerary extends Model
 {
@@ -33,5 +34,27 @@ class Itinerary extends Model
         return $this->belongsToMany(Activity::class, 'itineraries_activities')
             ->withPivot('title', 'date_time')
             ->withTimestamps();
+    }
+
+    // Actividades programadas del itinerario (filas de itineraries_activities con su id)
+    public function items()
+    {
+        return $this->hasMany(ItineraryActivity::class, 'itinerary_id');
+    }
+
+    // Recalcula el total: precio de cada actividad + alojamientos no cancelados
+    public function recalculateTotal(): void
+    {
+        $activitiesTotal = $this->items()
+            ->join('activities', 'activities.id', '=', 'itineraries_activities.activity_id')
+            ->sum('activities.price');
+
+        // Se consulta con DB::table porque los alojamientos los maneja el Dev 3
+        $accommodationsTotal = DB::table('itinerary_accommodations')
+            ->where('itinerary_id', $this->id)
+            ->where('status', '!=', 'cancelada')
+            ->sum('total_price');
+
+        $this->update(['total_price' => $activitiesTotal + $accommodationsTotal]);
     }
 }
