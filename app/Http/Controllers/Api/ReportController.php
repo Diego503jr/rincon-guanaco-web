@@ -58,7 +58,7 @@ class ReportController extends Controller
     private function destinationsReport(Carbon $from, Carbon $to): array
     {
         // Veces que cada destino se agregó a itinerarios (vía sus actividades) en el periodo
-        $usage = DB::table('itineraries_activities')
+        $uses = DB::table('itineraries_activities')
             ->join('activities', 'activities.id', '=', 'itineraries_activities.activity_id')
             ->whereBetween('itineraries_activities.created_at', [$from, $to])
             ->select('activities.destination_id', DB::raw('COUNT(*) as total'))
@@ -69,10 +69,10 @@ class ReportController extends Controller
             ->groupBy('destination_id');
 
         $top = DB::table('destinations')
-            ->joinSub($usage, 'usage', 'usage.destination_id', '=', 'destinations.id')
+            ->joinSub($uses, 'uses', 'uses.destination_id', '=', 'destinations.id')
             ->leftJoinSub($ratings, 'ratings', 'ratings.destination_id', '=', 'destinations.id')
-            ->select('destinations.name', 'destinations.department', 'usage.total', 'ratings.rating')
-            ->orderByDesc('usage.total')
+            ->select('destinations.name', 'destinations.department', 'uses.total', 'ratings.rating')
+            ->orderByDesc('uses.total')
             ->limit(5)
             ->get();
 
@@ -104,19 +104,19 @@ class ReportController extends Controller
     // ===== Reporte: Actividades más agregadas =====
     private function activitiesReport(Carbon $from, Carbon $to): array
     {
-        $usage = DB::table('itineraries_activities')
+        $uses = DB::table('itineraries_activities')
             ->whereBetween('created_at', [$from, $to])
             ->select('activity_id', DB::raw('COUNT(*) as total'))
             ->groupBy('activity_id');
 
         $rows = DB::table('activities')
             ->join('destinations', 'destinations.id', '=', 'activities.destination_id')
-            ->leftJoinSub($usage, 'usage', 'usage.activity_id', '=', 'activities.id')
+            ->leftJoinSub($uses, 'uses', 'uses.activity_id', '=', 'activities.id')
             ->select(
                 'activities.activity_name',
                 'destinations.name as destination',
                 'activities.price',
-                DB::raw('COALESCE(usage.total, 0) as total')
+                DB::raw('COALESCE(uses.total, 0) as total')
             )
             ->orderByDesc('total')
             ->orderBy('activities.activity_name')
