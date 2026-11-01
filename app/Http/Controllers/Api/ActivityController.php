@@ -47,6 +47,7 @@ class ActivityController extends Controller
             'people' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
             'duracion' => 'required',
+            'status' => 'sometimes|in:activo,inactivo', // permite reactivar desde el modal de edición
         ]);
 
         $activity->update($validated);

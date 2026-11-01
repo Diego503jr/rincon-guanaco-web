@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ActivityController;
+use App\Http\Controllers\Api\ReportController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -31,6 +33,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'stats']); //Contadores y datos de gráficos
+    
+    //Reportes PDF
+    Route::get('/admin/pdf-reports', [ReportController::class, 'pdf']); //Generar reporte PDF (?type=&from=&to=)
+    
+    //Actividades
+    Route::get('/admin/activities', [ActivityController::class, 'index']); //Listar actividades con su destino
+    Route::post('/admin/activities', [ActivityController::class, 'store']); //Crear actividad
+    Route::put('/admin/activities/{id}', [ActivityController::class, 'update']); //Editar actividad
+    Route::delete('/admin/activities/{id}', [ActivityController::class, 'destroy']); //Eliminado lógico
 
     // Usuarios
     Route::get('/admin/users', [UserController::class, 'index']);

@@ -12,7 +12,8 @@ class Activity extends Model
         'notes',
         'people',
         'price',
-        'duracion'
+        'duracion',
+        'status'
     ];
 
     protected function casts(): array
@@ -20,6 +21,12 @@ class Activity extends Model
         return [
             'price' => 'decimal:2',
         ];
+    }
+
+    // Relación con el destino al que pertenece la actividad
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class, 'destination_id');
     }
 
     // Relación con los itinerarios donde se agregó esta actividad

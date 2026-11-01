@@ -4,58 +4,62 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Itinerary;
-use App\Models\Review;
+use App\Models\ReportReview;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function stats()
+    public function stats(Request $request)
     {
+        $request->validate([
+            'days' => ['nullable', 'integer', 'in:7,30,90,365'],
+        ]);
+
+        $users        = User::where('role', 'user');
+        $itineraries  = Itinerary::where('is_completed', false);
+        // Se consulta con DB::table para no depender de la lógica del modelo Destination
+        $destinations = DB::table('destinations')->where('status', 'activo');
+        $alerts       = ReportReview::where('status', 'activo');
+
         // ===== Tarjetas de contadores =====
         $counters = [
-            'users'              => User::where('role', 'user')->count(),
-            'destinations'       => DB::table('destinations')->where('status', 'activo')->count(),
-            'active_itineraries' => Itinerary::where('is_completed', false)->count(),
-            'reviews'            => Review::count(),
-            'avg_rating'         => round((float) Review::avg('rating'), 1),
+            'users'              => $this->counter($users),
+            'active_itineraries' => $this->counter($itineraries),
+            'destinations'       => $this->counter($destinations),
+            'forum_alerts'       => $this->counter($alerts),
         ];
 
         return response()->json([
-            'counters'             => $counters,
-            'itineraries_by_month' => $this->itinerariesByMonth(),
-            'top_destinations'     => $this->topDestinations(),
+            'counters'         => $counters,
+            'top_destinations' => $this->topDestinations($request->integer('days', 30)),
+            'traveler_types'   => $this->travelerTypes(),
         ]);
     }
 
-    // Itinerarios creados en los últimos 6 meses 
-    private function itinerariesByMonth(): array
+        // Total + crecimiento: cuánto creció el total este mes respecto al total del mes anterior
+    private function counter($query): array
     {
-        $start = now()->startOfMonth()->subMonths(5);
+        $total  = (clone $query)->count();
+        $before = (clone $query)->where('created_at', '<', now()->startOfMonth())->count();
+        $new    = $total - $before;
 
-        $counts = Itinerary::where('created_at', '>=', $start)
-            ->get(['created_at'])
-            ->groupBy(fn($itinerary) => $itinerary->created_at->format('Y-m'))
-            ->map->count();
-
-        $labels = [];
-        $data = [];
-
-        for ($i = 0; $i < 6; $i++) {
-            $month = $start->copy()->addMonths($i);
-            $labels[] = ucfirst($month->locale('es')->translatedFormat('M Y'));
-            $data[] = $counts[$month->format('Y-m')] ?? 0;
-        }
-
-        return ['labels' => $labels, 'data' => $data];
+        return [
+            'total'      => $total,
+            'this_month' => $new,
+            // null cuando antes de este mes no había registros (no se puede calcular %)
+            'trend'      => $before > 0 ? round($new / $before * 100) : null,
+        ];
     }
 
-    // Destinos que más aparecen en itinerarios (vía sus actividades)
-    private function topDestinations(): array
+    // Destinos que más se agregan a itinerarios (vía sus actividades) en los últimos X días
+    private function topDestinations(int $days): array
     {
         $rows = DB::table('itineraries_activities')
             ->join('activities', 'activities.id', '=', 'itineraries_activities.activity_id')
             ->join('destinations', 'destinations.id', '=', 'activities.destination_id')
+            ->where('itineraries_activities.created_at', '>=', now()->subDays($days))
             ->select('destinations.name', DB::raw('COUNT(*) as total'))
             ->groupBy('destinations.id', 'destinations.name')
             ->orderByDesc('total')
@@ -66,5 +70,37 @@ class DashboardController extends Controller
             'labels' => $rows->pluck('name'),
             'data'   => $rows->pluck('total')->map(fn($total) => (int) $total),
         ];
+    }
+
+    // Usuarios agrupados por tipo de viajero
+    private function travelerTypes(): array
+    {
+        $names = [
+            'mochilero' => 'Mochileros',
+            'familia'   => 'Familiares',
+            'pareja'    => 'Parejas',
+        ];
+
+        $counts = User::where('role', 'user')
+            ->select('traveler_type', DB::raw('COUNT(*) as total'))
+            ->groupBy('traveler_type')
+            ->pluck('total', 'traveler_type');
+
+        $labels = [];
+        $data = [];
+
+        foreach ($names as $key => $label) {
+            $labels[] = $label;
+            $data[] = (int) ($counts[$key] ?? 0);
+        }
+
+        // Usuarios que no eligieron tipo de viajero
+        $unspecified = (int) ($counts[''] ?? 0);
+        if ($unspecified > 0) {
+            $labels[] = 'Sin especificar';
+            $data[] = $unspecified;
+        }
+
+        return ['labels' => $labels, 'data' => $data];
     }
 }

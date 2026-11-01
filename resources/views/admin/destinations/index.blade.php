@@ -19,7 +19,7 @@
             <a class="nav-link active text-white px-4 fw-semibold shadow-sm" style="background-color: #0D2A4D;" href="#">Destinos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="#">Actividades</a>
+            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.activities') }}">Actividades</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="#">Alojamiento</a>
