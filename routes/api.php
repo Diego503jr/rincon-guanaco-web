@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ItineraryController;
+use App\Http\Controllers\Api\ItineraryActivityController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -51,6 +52,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/itineraries/{id}', [ItineraryController::class, 'show']); 
     Route::patch('/itineraries/{id}', [ItineraryController::class, 'update']);
     Route::delete('/itineraries/{id}', [ItineraryController::class, 'destroy']); 
+
+    
+    //Actividades dentro del itinerario (modales Activity-Add / Activity-List)
+    Route::get('/activities', [ItineraryActivityController::class, 'available']); //Actividades activas (?destination_id=)
+    Route::post('/itineraries/{id}/activities', [ItineraryActivityController::class, 'store']); //Agregar actividad
+    Route::patch('/itineraries/{id}/activities/{itemId}', [ItineraryActivityController::class, 'update']); //Cambiar título u hora
+    Route::delete('/itineraries/{id}/activities/{itemId}', [ItineraryActivityController::class, 'destroy']); //Quitar actividad
 
     // Usuarios
     Route::get('/admin/users', [UserController::class, 'index']);
