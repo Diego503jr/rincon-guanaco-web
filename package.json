@@ -16,6 +16,8 @@
     },
     "dependencies": {
         "@popperjs/core": "^2.11.8",
-        "bootstrap": "5.3"
+        "bootstrap": "5.3",
+        "leaflet": "^1.9.4",
+        "leaflet-control-geocoder": "^4.0.0"
     }
 }

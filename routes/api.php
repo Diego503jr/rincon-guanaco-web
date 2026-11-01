@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DestinationController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -14,6 +15,13 @@ Route::post('/admin/login', [AuthController::class, 'adminLogin'])->middleware('
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Destinos
+    Route::get('/admin/destinations', [DestinationController::class, 'index']);
+    Route::get('/admin/destinations/{id}', [DestinationController::class, 'show']); 
+    Route::post('/admin/destinations', [DestinationController::class, 'store']);
+    Route::post('/admin/destinations/{id}', [DestinationController::class, 'update']); // Usando POST con _method si se envían archivos multipart/form-data
+    Route::delete('/admin/destinations/{id}', [DestinationController::class, 'destroy']);
 
     //Reviews
     Route::get('/admin/reports', [ModerationController::class, 'getReports']); //Listar reportes activos
