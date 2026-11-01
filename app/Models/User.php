@@ -20,7 +20,9 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'role',
         'traveler_type',
+        'status',
         'country_of_origin',
     ];
 

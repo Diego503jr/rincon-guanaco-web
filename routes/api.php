@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\DestinationController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -30,4 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'stats']); //Contadores y datos de gráficos
+
+    // Usuarios
+    Route::get('/admin/users', [UserController::class, 'index']);
+    Route::post('/admin/users', [UserController::class, 'store']);
+    Route::get('/admin/users/{user}', [UserController::class, 'show']);
+    Route::put('/admin/users/{user}', [UserController::class, 'update']);
+    Route::patch('/admin/users/{user}/status', [UserController::class, 'updateStatus']);
+    Route::delete('/admin/users/{user}', [UserController::class, 'destroy']);
 });
