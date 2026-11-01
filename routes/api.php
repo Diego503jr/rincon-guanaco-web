@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DestinationController;
+use App\Http\Controllers\Api\UserController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
