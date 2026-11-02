@@ -13,6 +13,9 @@ class ItineraryActivity extends Model
         'itinerary_id',
         'activity_id',
         'title',
+        'date_time',
+        'title',
+        'people',
         'date_time'
     ];
 
@@ -20,6 +23,9 @@ class ItineraryActivity extends Model
     {
         return [
             'date_time' => 'datetime:Y-m-d H:i:s', // sin zona horaria, para que la app no la convierta
+            'title',
+            'people',
+            'date_time'
         ];
     }
 
@@ -33,5 +39,12 @@ class ItineraryActivity extends Model
     public function activity()
     {
         return $this->belongsTo(Activity::class, 'activity_id');
+    }
+
+    
+    // Subtotal = precio de la actividad × personas
+    public function getSubtotalAttribute(): float
+    {
+        return round((float) ($this->activity->price ?? 0) * $this->people, 2);
     }
 }

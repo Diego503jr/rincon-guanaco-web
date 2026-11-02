@@ -18,7 +18,7 @@ class Itinerary extends Model
     {
         return [
             'is_completed' => 'boolean',
-            'total_price'  => 'decimal:2',
+            'total_price' => 'decimal:2',
         ];
     }
 
@@ -42,12 +42,12 @@ class Itinerary extends Model
         return $this->hasMany(ItineraryActivity::class, 'itinerary_id');
     }
 
-    // Recalcula el total: precio de cada actividad + alojamientos no cancelados
+        // Recalcula el total: (precio de cada actividad × personas) + alojamientos no cancelados
     public function recalculateTotal(): void
     {
         $activitiesTotal = $this->items()
             ->join('activities', 'activities.id', '=', 'itineraries_activities.activity_id')
-            ->sum('activities.price');
+            ->sum(DB::raw('activities.price * itineraries_activities.people'));
 
         // Se consulta con DB::table porque los alojamientos los maneja el Dev 3
         $accommodationsTotal = DB::table('itinerary_accommodations')

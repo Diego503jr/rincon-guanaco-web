@@ -13,14 +13,33 @@ class ItineraryController extends Controller
     public function index(Request $request)
     {
         $itineraries = Itinerary::where('user_id', $request->user()->id)
-            ->withCount('items as activities_count')
-            ->withMin('items as start_date', 'date_time')
-            ->withMax('items as end_date', 'date_time')
-            ->orderBy('is_completed')            
+            ->with(['items' => fn($query) => $query->orderBy('date_time')
+                ->with('activity.destination:id,name,municipality,department,image_url')])
+            ->orderBy('is_completed')            // primero los que están en curso
             ->orderByDesc('created_at')
             ->get();
 
-        return response()->json($itineraries);
+        // Datos listos para la tarjeta: foto, ubicación y fechas del viaje
+        $result = $itineraries->map(function ($itinerary) {
+            $items = $itinerary->items;
+            $destinations = $items->pluck('activity.destination')->filter()->unique('id');
+            $firstDestination = $destinations->first();
+
+            return [
+                'id'               => $itinerary->id,
+                'title'            => $itinerary->title,
+                'is_completed'     => $itinerary->is_completed,
+                'total_price'      => $itinerary->total_price,
+                'activities_count' => $items->count(),
+                'start_date'       => $items->first()?->date_time->format('Y-m-d H:i:s'),
+                'end_date'         => $items->last()?->date_time->format('Y-m-d H:i:s'),
+                'location'         => $destinations->pluck('name')->implode(', ') ?: null,
+                'cover_image'      => $this->imageUrl($firstDestination?->image_url),
+                'created_at'       => $itinerary->created_at,
+            ];
+        });
+
+        return response()->json($result);
     }
 
     // Crear un viaje nuevo (vacío)
@@ -49,7 +68,7 @@ class ItineraryController extends Controller
         $itinerary = $this->findOwned($request, $id);
 
         $items = $itinerary->items()
-            ->with('activity.destination:id,name,image_url')
+            ->with('activity.destination:id,name,municipality,department,image_url')
             ->orderBy('date_time')
             ->get();
 
@@ -70,8 +89,12 @@ class ItineraryController extends Controller
                         'id'          => $item->id,            // id del registro en el itinerario (para editar/quitar)
                         'activity_id' => $item->activity_id,
                         'title'       => $item->title,
+                        'people'      => $item->people,
+                        'subtotal'    => $item->subtotal,                // precio × personas
                         'date_time'   => $item->date_time->format('Y-m-d H:i:s'),
                         'time'        => $item->date_time->format('H:i'),
+                        'location'    => $this->location($item->activity?->destination),
+                        'image'       => $this->imageUrl($item->activity?->destination?->image_url),
                         'activity'    => $item->activity,
                     ])->values(),
                 ];
@@ -111,6 +134,20 @@ class ItineraryController extends Controller
         $this->findOwned($request, $id)->delete();
 
         return response()->json(['message' => 'Itinerario eliminado correctamente.']);
+    }
+
+    // Convierte la ruta guardada ("destinations/foto.jpg") en una URL completa para la app
+    private function imageUrl(?string $path): ?string
+    {
+        return $path ? asset('storage/' . $path) : null;
+    }
+
+    // "Volcán de Izalco · Izalco, Sonsonate"
+    private function location($destination): ?string
+    {
+        if (! $destination) return null;
+
+        return "{$destination->name} · {$destination->municipality}, {$destination->department}";
     }
 
     // Busca el itinerario solo entre los del usuario 
