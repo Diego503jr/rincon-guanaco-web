@@ -18,6 +18,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::view('/destinos', 'admin.destinations.index')->name('destinations.index');
     Route::view('/destinos/crear', 'admin.destinations.create')->name('destinations.create');
     Route::view('/destinos/{id}/editar', 'admin.destinations.edit')->name('destinations.edit');
+
+    // Alojamientos
+    Route::view('/destinos/alojamientos', 'admin.accommodations.index')->name('destinations.accommodations');
     
     // Actividades (pestaña dentro de Gestión Turística)
     Route::view('/destinos/actividades', 'admin.activities.index')->name('destinations.activities');

@@ -9,14 +9,20 @@ use Illuminate\Support\Facades\Storage;
 
 class AccommodationController extends Controller
 {
-    // Listar todos los alojamientos con su respectivo destino
     public function index()
     {
         $accommodations = Accommodation::with('destination')->orderBy('created_at', 'desc')->get();
         return response()->json($accommodations);
     }
 
-    // Guardar un nuevo alojamiento
+    public function show($id)
+    {
+        $accommodation = Accommodation::with('destination')->findOrFail($id);
+        return response()->json([
+            'accommodation' => $accommodation
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -28,11 +34,13 @@ class AccommodationController extends Controller
             'image_url' => 'nullable|image|max:5120',
             'contact_phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:150',
-            'status' => 'required|in:activo,inactivo',
+            'status' => 'nullable|in:activo,inactivo',
             'check_in' => 'required',
             'check_out' => 'required',
             'reserva' => 'nullable|integer',
         ]);
+
+        $validated['status'] = $validated['status'] ?? 'activo';
 
         if ($request->hasFile('image_url')) {
             $path = $request->file('image_url')->store('accommodations', 'public');
@@ -40,6 +48,7 @@ class AccommodationController extends Controller
         }
 
         $accommodation = Accommodation::create($validated);
+        $accommodation->load('destination');
 
         return response()->json([
             'message' => 'Alojamiento creado exitosamente.',
@@ -47,7 +56,6 @@ class AccommodationController extends Controller
         ], 201);
     }
 
-    // Actualizar un alojamiento existente
     public function update(Request $request, $id)
     {
         $accommodation = Accommodation::findOrFail($id);
@@ -75,6 +83,7 @@ class AccommodationController extends Controller
         }
 
         $accommodation->update($validated);
+        $accommodation->load('destination');
 
         return response()->json([
             'message' => 'Alojamiento actualizado correctamente.',
@@ -83,13 +92,11 @@ class AccommodationController extends Controller
     }
 
     public function destroy(int $id)
-{
-    $accommodation = Accommodation::findOrFail($id);
-    
-    // Eliminado lógico: cambiamos el estado a inactivo
-    $accommodation->status = 'inactivo';
-    $accommodation->save();
+    {
+        $accommodation = Accommodation::findOrFail($id);
+        $accommodation->status = 'inactivo';
+        $accommodation->save();
 
-    return response()->json(['message' => 'Alojamiento desactivado correctamente.']);
-}
+        return response()->json(['message' => 'Alojamiento desactivado correctamente.']);
+    }
 }

@@ -22,9 +22,20 @@
             <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.activities') }}">Actividades</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="#">Alojamiento</a>
+            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.accommodations') }}">Alojamientos</a>
         </li>
     </ul>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-5">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden bg-white border">
+                <span class="input-group-text bg-white border-0 text-muted ps-3">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchDestinationInput" class="form-control border-0 shadow-none ps-2" placeholder="Buscar destino...">
+            </div>
+        </div>
+    </div>
 
     <!-- Tabla Principal -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -276,5 +287,4 @@
 @endsection
 
 @vite([
-'resources/js/destinations/index.js',
-'resources/js/destinations/modal.js'])
+'resources/js/destinations.js'])

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ItineraryController;
 use App\Http\Controllers\Api\ItineraryActivityController;
+use App\Http\Controllers\Api\AccommodationController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -26,7 +27,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/destinations/{id}', [DestinationController::class, 'show']); 
     Route::post('/admin/destinations', [DestinationController::class, 'store']);
     Route::post('/admin/destinations/{id}', [DestinationController::class, 'update']); // Usando POST con _method si se envían archivos multipart/form-data
-    Route::delete('/admin/destinations/{id}', [DestinationController::class, 'destroy']);
+    Route::delete('/admin/destinations/{id}', [DestinationController::class, 'destroy']); //Eliminado lógico
+
+    // Alojamientos 
+    Route::get('/admin/accommodations', [AccommodationController::class, 'index']);
+    Route::get('/admin/accommodations/{id}', [AccommodationController::class, 'show']);
+    Route::post('/admin/accommodations', [AccommodationController::class, 'store']);
+    Route::post('/admin/accommodations/{id}', [AccommodationController::class, 'update']);
+    Route::delete('/admin/accommodations/{id}', [AccommodationController::class, 'destroy']); // Eliminado lógico
 
     //Reviews
     Route::get('/admin/reports', [ModerationController::class, 'getReports']); //Listar reportes activos
