@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Review extends Model
 {
     protected $fillable = [
-        'user_id', 
-        'destination_id', 
-        'rating', 
-        'comment', 
+        'user_id',
+        'destination_id',
+        'rating',
+        'comment',
         'travel_date'
     ];
 
@@ -18,5 +18,11 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    //Relación con el destino asociado a la reseña
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class, 'destination_id');
     }
 }

@@ -35,4 +35,10 @@ class Accommodation extends Model
     {
         return $this->belongsTo(Destination::class);
     }
+
+    //Relación con itinerario
+    public function itineraries()
+    {
+        return $this->belongsToMany(Itinerary::class, 'itinerary_accommodations', 'accommodation_id', 'itinerary_id');
+    }
 }

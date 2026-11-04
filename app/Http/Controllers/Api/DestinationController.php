@@ -52,7 +52,7 @@ class DestinationController extends Controller
     }
 
     // Actualizar un destino existente
-    public function update(Request $request,int $id)
+    public function update(Request $request, int $id)
     {
         $destination = Destination::findOrFail($id);
 
@@ -93,5 +93,30 @@ class DestinationController extends Controller
         $destination->save();
 
         return response()->json(['message' => 'Destino desactivado correctamente.']);
+    }
+
+    //Obtener destinos por usuario asociados a itinerario completo 
+    public function visitedByUser(Request $request)
+    {
+        // Validación de seguridad
+        if (!$request->user()) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        $userId = $request->user()->id;
+
+        $destinationsFromActivities = Destination::whereHas('activities.itineraries', function ($query) use ($userId) {
+            $query->where('itineraries.user_id', $userId)
+                ->where('itineraries.is_completed', 1);
+        })->get();
+
+        $destinationsFromAccommodations = Destination::whereHas('accommodations.itineraries', function ($query) use ($userId) {
+            $query->where('itineraries.user_id', $userId)
+                ->where('itineraries.is_completed', 1);
+        })->get();
+
+        $visitedDestinations = $destinationsFromActivities->merge($destinationsFromAccommodations)->unique('id')->values();
+
+        return response()->json($visitedDestinations);
     }
 }

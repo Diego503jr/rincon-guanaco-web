@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class ModerationController extends Controller
 {
+    //WEB
     public function getReports()
     {
         // Trae los reportes junto con la información del usuario y la reseña original
@@ -40,5 +41,27 @@ class ModerationController extends Controller
         $report->delete();
 
         return response()->json(['message' => 'Reporte eliminado físicamente.']);
+    }
+
+    //MÓVIL
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'review_id'   => 'required|exists:reviews,id',
+            'nota'        => 'required|string', 
+            'type_report' => 'required|string', 
+        ]);
+
+        $report = ReportReview::create([
+            'user_id'     => $request->user()->id,
+            'review_id'   => $validated['review_id'],
+            'nota'        => $validated['nota'],
+            'type_report' => $validated['type_report'],
+            'status'      => 'activo', // Se crea activo para revisión del administrador
+        ]);
+
+        return response()->json([
+            'message' => 'Gracias, hemos recibido tu reporte y será revisado'
+        ], 201);
     }
 }

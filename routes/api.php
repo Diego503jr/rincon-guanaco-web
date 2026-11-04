@@ -36,10 +36,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/accommodations/{id}', [AccommodationController::class, 'update']);
     Route::delete('/admin/accommodations/{id}', [AccommodationController::class, 'destroy']); // Eliminado lógico
 
-    //Reviews
+    //Reviews WEB
     Route::get('/admin/reports', [ModerationController::class, 'getReports']); //Listar reportes activos
     Route::patch('/admin/reports/{id}/status', [ModerationController::class, 'updateStatus']); //Eliminado lógico
     Route::delete('/admin/reports/{id}', [ModerationController::class, 'destroyReport']); //Eliminado físico
+
+    //Reviews MOVIL
+    Route::get('/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'index']); //Mostrar reseñas
+    Route::post('/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'store']); //Crear reseña
+    Route::post('/reviews/report', [\App\Http\Controllers\Api\ModerationController::class, 'store']); //Crear reporte
 
     //Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'stats']); //Contadores y datos de gráficos
@@ -52,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/activities', [ActivityController::class, 'store']); 
     Route::put('/admin/activities/{id}', [ActivityController::class, 'update']); 
     Route::delete('/admin/activities/{id}', [ActivityController::class, 'destroy']); //Eliminado lógico
+    Route::get('/user/visited-destinations', [DestinationController::class, 'visitedByUser']); //Destinos por itinerario de usuario
 
     
     //Itinerarios (app móvil: cada usuario solo ve los suyos)
