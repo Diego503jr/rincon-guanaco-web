@@ -3,7 +3,7 @@
 @section('title', 'Reportes')
 
 @section('content')
-    <h1 class="mb-1">Reportes y Descargar PDF</h1>
+    <h1 class="mb-1">Reportes Formato PDF</h1>
     <p class="text-muted">Genera y descarga reportes de la plataforma en formato PDF.</p>
 
     <!-- Filtros -->
@@ -31,7 +31,7 @@
                         <i class="bi bi-eye"></i>
                     </button>
                     <button type="submit" id="downloadBtn" class="btn btn-accent text-white fw-semibold flex-grow-1 text-nowrap">
-                        <i class="bi bi-download me-2"></i>Generar y Descargar PDF
+                        <i class="bi bi-download me-2"></i>Descargar PDF
                     </button>
                 </div>
             </form>

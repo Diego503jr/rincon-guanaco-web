@@ -10,9 +10,23 @@ use Illuminate\Support\Facades\Storage;
 class DestinationController extends Controller
 {
     // Listar todos los destinos
-    public function index()
+    public function index(Request $request)
     {
-        $destinations = Destination::orderBy('id', 'asc')->get();
+        $query = Destination::query();
+
+        // Filtrar por categoría si viene en el request
+        if ($request->has('category') && !empty($request->category)) {
+            $query->where('category', $request->category);
+        }
+        
+        // Usamos $query en lugar de Destination para respetar el filtro anterior
+        $destinations = $query->orderBy('id', 'asc')->get()->map(function ($destination) {
+            if ($destination->image_url && !str_starts_with($destination->image_url, 'http')) {
+                $destination->image_url = asset('storage/' . $destination->image_url);
+            }
+            return $destination;
+        });
+
         return response()->json($destinations);
     }
 
@@ -20,6 +34,11 @@ class DestinationController extends Controller
     public function show(int $id)
     {
         $destination = Destination::findOrFail($id);
+
+        if ($destination->image_url && !str_starts_with($destination->image_url, 'http')) {
+            $destination->image_url = asset('storage/' . $destination->image_url);
+        }
+
         return response()->json($destination);
     }
 

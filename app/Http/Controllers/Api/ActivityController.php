@@ -68,4 +68,14 @@ class ActivityController extends Controller
 
         return response()->json(['message' => 'Actividad desactivada correctamente.']);
     }
+
+    // Obtener actividades filtradas por ID de destino
+    public function getByDestination(int $destinationId)
+    {
+        $activities = Activity::where('destination_id', $destinationId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($activities);
+    }
 }

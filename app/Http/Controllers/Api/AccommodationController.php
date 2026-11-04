@@ -99,4 +99,21 @@ class AccommodationController extends Controller
 
         return response()->json(['message' => 'Alojamiento desactivado correctamente.']);
     }
+
+    // Obtener alojamientos filtrados por ID de destino
+    public function getByDestination(int $destinationId)
+    {
+        $accommodations = Accommodation::where('destination_id', $destinationId)
+            ->where('status', 'activo')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($accommodation) {
+                if ($accommodation->image_url && !str_starts_with($accommodation->image_url, 'http')) {
+                    $accommodation->image_url = asset('storage/' . $accommodation->image_url);
+                }
+                return $accommodation;
+            });
+
+        return response()->json($accommodations);
+    }
 }

@@ -36,6 +36,7 @@ class ItineraryActivityController extends Controller
         $data = $request->validate([
             'activity_id' => ['required', Rule::exists('activities', 'id')->where('status', 'activo')],
             'date_time'   => ['required', 'date'],
+            'people'      => ['nullable', 'integer', 'min:1', 'max:50'],
             'title'       => ['nullable', 'string', 'max:150'],
         ], [
             'activity_id.exists' => 'La actividad no existe o está inactiva.',
@@ -47,6 +48,7 @@ class ItineraryActivityController extends Controller
             'activity_id' => $activity->id,
             // Si el usuario no escribe un título, se usa el nombre de la actividad
             'title'       => $data['title'] ?? $activity->activity_name,
+            'people'      => $data['people'] ?? 1,
             'date_time'   => $data['date_time'],
         ]);
 
@@ -59,7 +61,7 @@ class ItineraryActivityController extends Controller
         ], 201);
     }
 
-    // Cambiar título u hora de una actividad del itinerario (mover de día)
+    // Cambiar título, hora (mover de día) o personas de una actividad del itinerario (modal Activity-Edit)
     public function update(Request $request, int $itineraryId, int $itemId)
     {
         $itinerary = $this->findOwned($request, $itineraryId);
@@ -68,13 +70,18 @@ class ItineraryActivityController extends Controller
         $data = $request->validate([
             'title'     => ['sometimes', 'required', 'string', 'max:150'],
             'date_time' => ['sometimes', 'required', 'date'],
+            'people'    => ['sometimes', 'required', 'integer', 'min:1', 'max:50'],
         ]);
 
         $item->update($data);
 
+        // Si cambiaron las personas, cambia el total del itinerario
+        $itinerary->recalculateTotal();
+
         return response()->json([
-            'message' => 'Actividad del itinerario actualizada.',
-            'item'    => $item->load('activity'),
+            'message'     => 'Actividad del itinerario actualizada.',
+            'item'        => $item->load('activity'),
+            'total_price' => $itinerary->total_price,
         ]);
     }
 
