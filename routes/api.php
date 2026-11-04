@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/accommodations', [AccommodationController::class, 'store']);
     Route::post('/admin/accommodations/{id}', [AccommodationController::class, 'update']);
     Route::delete('/admin/accommodations/{id}', [AccommodationController::class, 'destroy']); // Eliminado lógico
+    Route::get('/destinations/{destinationId}/accommodations', [AccommodationController::class, 'getByDestination']);
 
     //Reviews
     Route::get('/admin/reports', [ModerationController::class, 'getReports']); //Listar reportes activos
@@ -52,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/activities', [ActivityController::class, 'store']); 
     Route::put('/admin/activities/{id}', [ActivityController::class, 'update']); 
     Route::delete('/admin/activities/{id}', [ActivityController::class, 'destroy']); //Eliminado lógico
+    Route::get('/destinations/{destinationId}/activities', [ActivityController::class, 'getByDestination']);
 
     
     //Itinerarios (app móvil: cada usuario solo ve los suyos)
