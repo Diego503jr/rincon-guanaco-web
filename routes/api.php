@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ItineraryController;
 use App\Http\Controllers\Api\ItineraryActivityController;
+use App\Http\Controllers\Api\ItineraryAccommodationController;
 use App\Http\Controllers\Api\AccommodationController;
 
 // Públicas
@@ -75,6 +76,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/itineraries/{id}/activities', [ItineraryActivityController::class, 'store']); //Agregar actividad
     Route::patch('/itineraries/{id}/activities/{itemId}', [ItineraryActivityController::class, 'update']); //Cambiar título u hora
     Route::delete('/itineraries/{id}/activities/{itemId}', [ItineraryActivityController::class, 'destroy']); //Quitar actividad
+
+    //Alojamientos dentro del itinerario (modal Reservar Alojamiento)
+    Route::post('/itineraries/{id}/accommodations', [ItineraryAccommodationController::class, 'store']); //Reservar alojamiento
+    Route::patch('/itineraries/{id}/accommodations/{itemId}', [ItineraryAccommodationController::class, 'update']); //Cambiar fechas o huéspedes
+    Route::delete('/itineraries/{id}/accommodations/{itemId}', [ItineraryAccommodationController::class, 'destroy']); //Quitar alojamiento
 
     // Usuarios
     Route::get('/admin/users', [UserController::class, 'index']);

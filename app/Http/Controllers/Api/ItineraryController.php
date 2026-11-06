@@ -15,6 +15,8 @@ class ItineraryController extends Controller
         $itineraries = Itinerary::where('user_id', $request->user()->id)
             ->with(['items' => fn($query) => $query->orderBy('date_time')
                 ->with('activity.destination:id,name,municipality,department,image_url')])
+            ->with(['accommodationItems' => fn($query) => $query->orderBy('check_in')
+                ->with('accommodation.destination:id,name,municipality,department,image_url')])
             ->orderBy('is_completed')            // primero los que están en curso
             ->orderByDesc('created_at')
             ->get();
@@ -22,20 +24,31 @@ class ItineraryController extends Controller
         // Datos listos para la tarjeta: foto, ubicación y fechas del viaje
         $result = $itineraries->map(function ($itinerary) {
             $items = $itinerary->items;
-            $destinations = $items->pluck('activity.destination')->filter()->unique('id');
+            $stays = $itinerary->accommodationItems;
+
+            $destinations = $items->pluck('activity.destination')
+                ->merge($stays->pluck('accommodation.destination'))
+                ->filter()->unique('id');
             $firstDestination = $destinations->first();
 
+            // El viaje empieza en la primera actividad o entrada, y termina en la última actividad o salida
+            $dates = $items->pluck('date_time')
+                ->merge($stays->pluck('check_in'))
+                ->merge($stays->pluck('check_out'))
+                ->filter()->sort()->values();
+
             return [
-                'id'               => $itinerary->id,
-                'title'            => $itinerary->title,
-                'is_completed'     => $itinerary->is_completed,
-                'total_price'      => $itinerary->total_price,
-                'activities_count' => $items->count(),
-                'start_date'       => $items->first()?->date_time->format('Y-m-d H:i:s'),
-                'end_date'         => $items->last()?->date_time->format('Y-m-d H:i:s'),
-                'location'         => $destinations->pluck('name')->implode(', ') ?: null,
-                'cover_image'      => $this->imageUrl($firstDestination?->image_url),
-                'created_at'       => $itinerary->created_at,
+                'id'                   => $itinerary->id,
+                'title'                => $itinerary->title,
+                'is_completed'         => $itinerary->is_completed,
+                'total_price'          => $itinerary->total_price,
+                'activities_count'     => $items->count(),
+                'accommodations_count' => $stays->count(),
+                'start_date'           => $dates->first()?->format('Y-m-d H:i:s'),
+                'end_date'             => $dates->last()?->format('Y-m-d H:i:s'),
+                'location'             => $destinations->pluck('name')->implode(', ') ?: null,
+                'cover_image'          => $this->imageUrl($firstDestination?->image_url),
+                'created_at'           => $itinerary->created_at,
             ];
         });
 
@@ -100,13 +113,35 @@ class ItineraryController extends Controller
                 ];
             });
 
+        // Alojamientos reservados (pestaña Alojamiento del detalle)
+        $accommodations = $itinerary->accommodationItems()
+            ->with('accommodation.destination:id,name,municipality,department,image_url')
+            ->orderBy('check_in')
+            ->get()
+            ->map(fn($stay) => [
+                'id'               => $stay->id,            // id del registro en el itinerario (para editar/quitar)
+                'accommodation_id' => $stay->accommodation_id,
+                'name'             => $stay->accommodation?->name,
+                'type'             => $stay->accommodation?->type,
+                'guests'           => $stay->guests,
+                'nights'           => $stay->nights,
+                'price_per_night'  => $stay->accommodation?->price,
+                'total_price'      => $stay->total_price,
+                'status'           => $stay->status,
+                'check_in'         => $stay->check_in->format('Y-m-d H:i:s'),
+                'check_out'        => $stay->check_out->format('Y-m-d H:i:s'),
+                'location'         => $this->location($stay->accommodation?->destination),
+                'image'            => $this->imageUrl($stay->accommodation?->image_url ?? $stay->accommodation?->destination?->image_url),
+            ]);
+
         return response()->json([
-            'id'           => $itinerary->id,
-            'title'        => $itinerary->title,
-            'is_completed' => $itinerary->is_completed,
-            'total_price'  => $itinerary->total_price,
-            'created_at'   => $itinerary->created_at,
-            'days'         => $days,
+            'id'             => $itinerary->id,
+            'title'          => $itinerary->title,
+            'is_completed'   => $itinerary->is_completed,
+            'total_price'    => $itinerary->total_price,
+            'created_at'     => $itinerary->created_at,
+            'days'           => $days,
+            'accommodations' => $accommodations,
         ]);
     }
 
@@ -128,7 +163,7 @@ class ItineraryController extends Controller
         ]);
     }
 
-    // Eliminar un itinerario (sus actividades se borran en cascada)
+    // Eliminar un itinerario (sus actividades y alojamientos se borran en cascada)
     public function destroy(Request $request, int $id)
     {
         $this->findOwned($request, $id)->delete();

@@ -42,6 +42,12 @@ class Itinerary extends Model
         return $this->hasMany(ItineraryActivity::class, 'itinerary_id');
     }
 
+    // Alojamientos reservados del itinerario (filas de itinerary_accommodations con su id)
+    public function accommodationItems()
+    {
+        return $this->hasMany(ItineraryAccommodation::class, 'itinerary_id');
+    }
+
         // Recalcula el total: (precio de cada actividad × personas) + alojamientos no cancelados
     public function recalculateTotal(): void
     {
@@ -49,9 +55,7 @@ class Itinerary extends Model
             ->join('activities', 'activities.id', '=', 'itineraries_activities.activity_id')
             ->sum(DB::raw('activities.price * itineraries_activities.people'));
 
-        // Se consulta con DB::table porque los alojamientos los maneja el Dev 3
-        $accommodationsTotal = DB::table('itinerary_accommodations')
-            ->where('itinerary_id', $this->id)
+        $accommodationsTotal = $this->accommodationItems()
             ->where('status', '!=', 'cancelada')
             ->sum('total_price');
 
