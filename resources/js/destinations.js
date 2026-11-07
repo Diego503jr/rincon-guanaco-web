@@ -30,47 +30,72 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // Generar HTML de la fila de la tabla
+    // Generar HTML de la fila de la tabla con todos los campos
     const createDestinationRowHTML = (item) => {
-        const imageUrl = item.image_url ? `/storage/${item.image_url}` : null;
+        const imageUrl = item.image_url || null;
         const imageTag = imageUrl
-            ? `<img src="${imageUrl}" class="rounded-3 shadow-sm border" width="110" height="70" style="object-fit: cover;" alt="${item.name}">`
-            : `<div class="rounded-3 border bg-light text-muted d-flex align-items-center justify-content-center" style="width: 110px; height: 70px; font-size: 0.75rem;">Sin Imagen</div>`;
+            ? `<img src="${imageUrl}" class="rounded-3 shadow-sm border" width="90" height="60" style="object-fit: cover;" alt="${item.name}">`
+            : `<div class="rounded-3 border bg-light text-muted d-flex align-items-center justify-content-center" style="width: 90px; height: 60px; font-size: 0.70rem;">Sin Imagen</div>`;
 
-        const locationStr = `${item.municipality || ''}, ${item.department || ''}`;
+        const locationStr = `${item.municipality || ""}, ${item.department || ""}`;
 
-        let badgeStyle = "background-color: #e2f9f1; color: #2A9D8F; border: 1px solid #c2e8e0; font-weight: 500;";
+        // Determinar icono según la categoría
         let categoryIcon = "bi-geo-alt-fill";
         const cat = (item.category || "").toLowerCase();
-        if (cat.includes("playa")) categoryIcon = "bi-water";
-        else if (cat.includes("montaña")) categoryIcon = "bi-tree-fill";
-        else if (cat.includes("cultural") || cat.includes("cultura")) categoryIcon = "bi-camera-fill";
-        else if (cat.includes("lago")) categoryIcon = "bi-droplet-fill";
-        else if (cat.includes("histórico")) categoryIcon = "bi-bank";
+        if (cat.includes("playa")) {
+            categoryIcon = "bi-water"; 
+        } else if (cat.includes("montaña")) {
+            categoryIcon = "bi-tree-fill"; 
+        } else if (cat.includes("cultural")) {
+            categoryIcon = "bi-bank"; 
+        } else if (
+            cat.includes("gastronómico") ||
+            cat.includes("gastronomico")
+        ) {
+            categoryIcon = "bi-cup-hot-fill"; 
+        } else if (cat.includes("aventura")) {
+            categoryIcon = "bi-compass-fill"; 
+        } else if (cat.includes("relax")) {
+            categoryIcon = "bi-sun-fill"; 
+        }
 
         const isActive = item.status === "activo";
         const statusBadge = isActive
-            ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Activo</span>`
-            : `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fw-semibold"><i class="bi bi-x-circle-fill me-1"></i> Inactivo</span>`;
+            ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Activo</span>`
+            : `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill fw-semibold"><i class="bi bi-x-circle-fill me-1"></i> Inactivo</span>`;
+
+        // Recortar la descripción para que la tabla luzca limpia y ordenada
+        const shortDesc = item.description
+            ? item.description.length > 45
+                ? item.description.substring(0, 45) + "..."
+                : item.description
+            : "Sin descripción";
 
         return `
-            <td class="px-4 fw-bold text-secondary">#${String(item.id).padStart(3, '0')}</td>
-            <td>${imageTag}</td>
-            <td class="fw-bold text-dark">${item.name}</td>
-            <td class="text-muted small">${locationStr}</td>
-            <td class="text-muted text-capitalize">${item.type || item.category || ''}</td>
-            <td>${statusBadge}</td>
-            <td class="text-end px-4">
-                <button class="btn btn-sm p-1 me-2 edit-btn border-0 bg-transparent shadow-none" data-id="${item.id}" title="Editar" style="color: #0D2A4D !important;">
-                    <i class="bi bi-pencil fs-5"></i>
-                </button>
-                <button class="btn btn-sm p-1 delete-btn border-0 bg-transparent shadow-none" data-id="${item.id}" title="Desactivar" style="color: #f2994a !important;">
-                    <i class="bi bi-trash fs-5"></i>
-                </button>
-            </td>
-        `;
+        <td class="px-3 fw-bold text-secondary">#${String(item.id).padStart(3, "0")}</td>
+        <td>${imageTag}</td>
+        <td>
+            <div class="fw-bold text-dark">${item.name}</div>
+            <small class="text-muted text-truncate d-inline-block" style="max-width: 220px;" title="${item.description || ""}">${shortDesc}</small>
+        </td>
+        <td class="text-muted small">${locationStr}</td>
+        <td>
+            <span class="badge" style="background-color: #e2f9f1; color: #2A9D8F; border: 1px solid #c2e8e0; font-weight: 500;">
+                <i class="bi ${categoryIcon} me-1"></i>${item.category || "N/A"}
+            </span>
+        </td>
+        <td class="text-muted small">${item.traveler_type || "General"}</td>
+        <td>${statusBadge}</td>
+        <td class="text-end px-3">
+            <button class="btn btn-sm p-1 me-1 edit-btn border-0 bg-transparent shadow-none" data-id="${item.id}" title="Editar" style="color: #0D2A4D !important;">
+                <i class="bi bi-pencil fs-5"></i>
+            </button>
+            <button class="btn btn-sm p-1 delete-btn border-0 bg-transparent shadow-none" data-id="${item.id}" title="Desactivar" style="color: #f2994a !important;">
+                <i class="bi bi-trash fs-5"></i>
+            </button>
+        </td>
+    `;
     };
-
     // Función para renderizar la tabla dinámicamente
     function renderTable(items) {
         if (!tableBody) return;
@@ -104,7 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!res.ok) throw new Error("Error al obtener los destinos");
 
             const data = await res.json();
-            allDestinations = Array.isArray(data) ? data : (data.destinations || data.data || []);
+            allDestinations = Array.isArray(data)
+                ? data
+                : data.destinations || data.data || [];
             renderTable(allDestinations);
         } catch (err) {
             console.error("Error cargando destinos:", err);
@@ -118,11 +145,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {
             const query = e.target.value.toLowerCase();
-            const filtered = allDestinations.filter(item => 
-                (item.name && item.name.toLowerCase().includes(query)) ||
-                (item.department && item.department.toLowerCase().includes(query)) ||
-                (item.municipality && item.municipality.toLowerCase().includes(query)) ||
-                (item.category && item.category.toLowerCase().includes(query))
+            const filtered = allDestinations.filter(
+                (item) =>
+                    (item.name && item.name.toLowerCase().includes(query)) ||
+                    (item.department &&
+                        item.department.toLowerCase().includes(query)) ||
+                    (item.municipality &&
+                        item.municipality.toLowerCase().includes(query)) ||
+                    (item.category &&
+                        item.category.toLowerCase().includes(query)),
             );
             renderTable(filtered);
         });
@@ -144,7 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     container.style.backgroundImage = `url('${event.target.result}')`;
                     container.style.backgroundSize = "cover";
                     container.style.backgroundPosition = "center";
-                    if (previewText) previewText.textContent = `Seleccionada: ${file.name}`;
+                    if (previewText)
+                        previewText.textContent = `Seleccionada: ${file.name}`;
                 };
                 reader.readAsDataURL(file);
             }
@@ -172,16 +204,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     maxZoom: 19,
                 }).setView([13.6929, -89.2182], 9);
 
-                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                    maxZoom: 19,
-                }).addTo(createMap);
+                L.tileLayer(
+                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    {
+                        maxZoom: 19,
+                    },
+                ).addTo(createMap);
 
                 createElSalvadorGeocoder()
                     .on("markgeocode", function (e) {
                         const latlng = e.geocode.center;
                         createMap.setView(latlng, 14);
-                        document.getElementById("latitude").value = latlng.lat.toFixed(7);
-                        document.getElementById("longitude").value = latlng.lng.toFixed(7);
+                        document.getElementById("latitude").value =
+                            latlng.lat.toFixed(7);
+                        document.getElementById("longitude").value =
+                            latlng.lng.toFixed(7);
                         if (createMarker) createMarker.setLatLng(latlng);
                         else createMarker = L.marker(latlng).addTo(createMap);
                     })
@@ -227,7 +264,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     Swal.fire({
                         icon: "error",
                         title: "Validación",
-                        html: Object.values(data.errors ?? {}).flat().join("<br>"),
+                        html: Object.values(data.errors ?? {})
+                            .flat()
+                            .join("<br>"),
                     });
                     return;
                 }
@@ -236,11 +275,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.bootstrap.Modal.getInstance(createModalEl)?.hide();
                 createForm.reset();
 
-                const previewContainer = document.querySelector("#createDestinationModal .border-dashed");
+                const previewContainer = document.querySelector(
+                    "#createDestinationModal .border-dashed",
+                );
                 if (previewContainer) {
                     previewContainer.style.backgroundImage = "none";
-                    const previewText = previewContainer.querySelector(".fw-semibold");
-                    if (previewText) previewText.textContent = "Arrastra una imagen aquí o haz clic para seleccionar";
+                    const previewText =
+                        previewContainer.querySelector(".fw-semibold");
+                    if (previewText)
+                        previewText.textContent =
+                            "Arrastra una imagen aquí o haz clic para seleccionar";
                 }
 
                 Swal.fire({
@@ -251,7 +295,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     showConfirmButton: false,
                 }).then(() => loadDestinations());
             } catch (err) {
-                Swal.fire("Error", "No se pudo conectar con el servidor.", "error");
+                Swal.fire(
+                    "Error",
+                    "No se pudo conectar con el servidor.",
+                    "error",
+                );
             }
         });
     }
@@ -277,34 +325,50 @@ document.addEventListener("DOMContentLoaded", () => {
                 const dest = responseData.destination || responseData;
                 if (!dest) return;
 
-                document.getElementById("edit_destination_id").value = dest.id || "";
+                document.getElementById("edit_destination_id").value =
+                    dest.id || "";
                 document.getElementById("edit_name").value = dest.name || "";
-                document.getElementById("edit_department").value = dest.department || "";
-                document.getElementById("edit_municipality").value = dest.municipality || "";
-                document.getElementById("edit_description").value = dest.description || "";
-                document.getElementById("edit_latitude").value = dest.latitude || "";
-                document.getElementById("edit_longitude").value = dest.longitude || "";
-                document.getElementById("edit_category").value = dest.category || "";
-                document.getElementById("edit_traveler_type").value = dest.traveler_type || "";
+                document.getElementById("edit_department").value =
+                    dest.department || "";
+                document.getElementById("edit_municipality").value =
+                    dest.municipality || "";
+                document.getElementById("edit_description").value =
+                    dest.description || "";
+                document.getElementById("edit_latitude").value =
+                    dest.latitude || "";
+                document.getElementById("edit_longitude").value =
+                    dest.longitude || "";
+                document.getElementById("edit_category").value =
+                    dest.category || "";
+                document.getElementById("edit_traveler_type").value =
+                    dest.traveler_type || "";
 
                 const statusVal = dest.status || "activo";
                 document.getElementById("edit_status").value = statusVal;
-                const statusSwitch = document.getElementById("edit_status_switch");
+                const statusSwitch =
+                    document.getElementById("edit_status_switch");
                 if (statusSwitch) statusSwitch.checked = statusVal === "activo";
 
                 // Mostrar imagen actual en la vista previa del modal de edición si existe
-                const editContainer = document.querySelector("#editDestinationModal .border-dashed");
+                const editContainer = document.querySelector(
+                    "#editDestinationModal .border-dashed",
+                );
                 if (editContainer) {
                     if (dest.image_url) {
-                        editContainer.style.backgroundImage = `url('/storage/${dest.image_url}')`;
+                        editContainer.style.backgroundImage = `url('${dest.image_url}')`;
                         editContainer.style.backgroundSize = "cover";
                         editContainer.style.backgroundPosition = "center";
-                        const previewText = editContainer.querySelector(".fw-semibold");
-                        if (previewText) previewText.textContent = "Imagen actual cargada";
+                        const previewText =
+                            editContainer.querySelector(".fw-semibold");
+                        if (previewText)
+                            previewText.textContent = "Imagen actual cargada";
                     } else {
                         editContainer.style.backgroundImage = "none";
-                        const previewText = editContainer.querySelector(".fw-semibold");
-                        if (previewText) previewText.textContent = "Haz clic para cambiar la imagen";
+                        const previewText =
+                            editContainer.querySelector(".fw-semibold");
+                        if (previewText)
+                            previewText.textContent =
+                                "Haz clic para cambiar la imagen";
                     }
                 }
 
@@ -323,24 +387,35 @@ document.addEventListener("DOMContentLoaded", () => {
                             maxZoom: 19,
                         }).setView([lat, lng], 13);
 
-                        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(editMap);
+                        L.tileLayer(
+                            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                            { maxZoom: 19 },
+                        ).addTo(editMap);
 
                         createElSalvadorGeocoder()
                             .on("markgeocode", function (ev) {
                                 const latlng = ev.geocode.center;
                                 editMap.setView(latlng, 14);
-                                document.getElementById("edit_latitude").value = latlng.lat.toFixed(7);
-                                document.getElementById("edit_longitude").value = latlng.lng.toFixed(7);
+                                document.getElementById("edit_latitude").value =
+                                    latlng.lat.toFixed(7);
+                                document.getElementById(
+                                    "edit_longitude",
+                                ).value = latlng.lng.toFixed(7);
                                 if (editMarker) editMarker.setLatLng(latlng);
-                                else editMarker = L.marker(latlng).addTo(editMap);
+                                else
+                                    editMarker =
+                                        L.marker(latlng).addTo(editMap);
                             })
                             .addTo(editMap);
 
                         editMap.on("click", (ev) => {
-                            document.getElementById("edit_latitude").value = ev.latlng.lat.toFixed(7);
-                            document.getElementById("edit_longitude").value = ev.latlng.lng.toFixed(7);
+                            document.getElementById("edit_latitude").value =
+                                ev.latlng.lat.toFixed(7);
+                            document.getElementById("edit_longitude").value =
+                                ev.latlng.lng.toFixed(7);
                             if (editMarker) editMarker.setLatLng(ev.latlng);
-                            else editMarker = L.marker(ev.latlng).addTo(editMap);
+                            else
+                                editMarker = L.marker(ev.latlng).addTo(editMap);
                         });
                     } else {
                         editMap.invalidateSize();
@@ -354,7 +429,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }, 300);
             } catch (err) {
-                Swal.fire("Error", "No se pudieron cargar los datos para edición.", "error");
+                Swal.fire(
+                    "Error",
+                    "No se pudieron cargar los datos para edición.",
+                    "error",
+                );
             }
             return;
         }
@@ -392,7 +471,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         showConfirmButton: false,
                     }).then(() => loadDestinations());
                 } catch (err) {
-                    Swal.fire("Error", "No se pudo completar la operación.", "error");
+                    Swal.fire(
+                        "Error",
+                        "No se pudo completar la operación.",
+                        "error",
+                    );
                 }
             }
         }
@@ -429,13 +512,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     Swal.fire({
                         icon: "error",
                         title: "Error de Validación",
-                        html: Object.values(data.errors ?? {}).flat().join("<br>"),
+                        html: Object.values(data.errors ?? {})
+                            .flat()
+                            .join("<br>"),
                     });
                     return;
                 }
                 if (!res.ok) throw new Error(data.message ?? "Error");
 
-                window.bootstrap.Modal.getInstance(document.getElementById("editDestinationModal"))?.hide();
+                window.bootstrap.Modal.getInstance(
+                    document.getElementById("editDestinationModal"),
+                )?.hide();
 
                 Swal.fire({
                     icon: "success",
@@ -445,7 +532,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     showConfirmButton: false,
                 }).then(() => loadDestinations());
             } catch (err) {
-                Swal.fire("Error", `No se pudo actualizar: ${err.message}`, "error");
+                Swal.fire(
+                    "Error",
+                    `No se pudo actualizar: ${err.message}`,
+                    "error",
+                );
             }
         });
     }

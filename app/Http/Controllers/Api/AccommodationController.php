@@ -10,11 +10,19 @@ use Illuminate\Support\Facades\Storage;
 class AccommodationController extends Controller
 {
     public function index()
-    {
-        $accommodations = Accommodation::with('destination')->orderBy('created_at', 'desc')->get();
-        return response()->json($accommodations);
-    }
+{
+    $accommodations = Accommodation::with('destination')
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($accommodation) {
+            if ($accommodation->image_url && !str_starts_with($accommodation->image_url, 'http')) {
+                $accommodation->image_url = asset('storage/' . $accommodation->image_url);
+            }
+            return $accommodation;
+        });
 
+    return response()->json($accommodations);
+}
     public function show($id)
     {
         $accommodation = Accommodation::with('destination')->findOrFail($id);

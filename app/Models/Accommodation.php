@@ -30,6 +30,15 @@ class Accommodation extends Model
         ];
     }
 
+    // Accessor para formatear automáticamente image_url a URL completa
+    public function getImageUrlAttribute($value)
+    {
+        if ($value && !str_starts_with($value, 'http')) {
+            return asset('storage/' . $value);
+        }
+        return $value;
+    }
+
     // Relación: Un alojamiento pertenece a un destino
     public function destination()
     {

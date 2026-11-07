@@ -41,14 +41,14 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light text-uppercase fs-7 text-secondary">
                         <tr>
-                            <th class="py-3 px-4">ID</th>
+                            <th class="py-3 px-3">ID</th>
                             <th class="py-3">Fotografía</th>
-                            <th class="py-3">Nombre</th>
-                            <th class="py-3">Ubicación</th>
+                            <th class="py-3">Alojamiento y Contacto</th>
+                            <th class="py-3">Ubicación / Dirección</th>
                             <th class="py-3">Tipo</th>
-                            <th class="py-3">Precio por noche</th>
+                            <th class="py-3">Precio / Horarios</th>
                             <th class="py-3">Estado</th>
-                            <th class="py-3 text-end px-4">Acciones</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="accommodationsTableBody"></tbody>

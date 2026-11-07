@@ -46,9 +46,10 @@
                         <tr>
                             <th class="py-3 px-4">ID</th>
                             <th class="py-3">Fotografía</th>
-                            <th class="py-3">Nombre del destino</th>
-                            <th class="py-3">Ciudad/Municipio</th>
+                            <th class="py-3">Nombre</th>
+                            <th class="py-3">Ubicación</th>
                             <th class="py-3">Categoría</th>
+                            <th>Tipo de Viajero</th>
                             <th class="py-3">Estado</th>
                             <th class="py-3 text-end px-4">Acciones</th>
                         </tr>
