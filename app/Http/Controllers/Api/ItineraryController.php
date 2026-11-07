@@ -172,9 +172,11 @@ class ItineraryController extends Controller
     }
 
     // Convierte la ruta guardada ("destinations/foto.jpg") en una URL completa para la app
-    private function imageUrl(?string $path): ?string
+        private function imageUrl(?string $path): ?string
     {
-        return $path ? asset('storage/' . $path) : null;
+        if (! $path) return null;
+
+        return str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
     }
 
     // "Volcán de Izalco · Izalco, Sonsonate"
