@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ItineraryController;
 use App\Http\Controllers\Api\ItineraryActivityController;
 use App\Http\Controllers\Api\ItineraryAccommodationController;
 use App\Http\Controllers\Api\AccommodationController;
+use App\Http\Controllers\Api\ProfileController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -22,6 +23,10 @@ Route::post('/admin/login', [AuthController::class, 'adminLogin'])->middleware('
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Perfil del usuario (app móvil)
+    Route::put('/me', [ProfileController::class, 'update']); //Editar datos personales
+    Route::put('/me/password', [ProfileController::class, 'password']); //Cambiar contraseña
 
     // Destinos
     Route::get('/admin/destinations', [DestinationController::class, 'index']);
