@@ -29,7 +29,6 @@ class AuthController extends Controller
 
         return response()->json([
             'user'  => new UserResource($user),
-            'token' => $user->createToken('mobile')->plainTextToken,
         ], 201);
     }
 
