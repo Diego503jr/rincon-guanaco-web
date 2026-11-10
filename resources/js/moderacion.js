@@ -18,7 +18,29 @@ document.addEventListener('DOMContentLoaded', async function () {
     try {
         const res = await window.api('/admin/reports');
         if (res.ok) {
-            allReports = await res.json();
+            const rawReports = await res.json();
+
+            // Crear un Set para llevar el registro de las combinaciones únicas
+            const uniqueCombos = new Set();
+
+            // Filtrar el arreglo original para dejar solo uno por combinación
+            allReports = rawReports.filter(report => {
+                const reviewId = report.review ? report.review.id : report.review_id;
+                const nota = report.nota || '';
+
+                // Crear un identificador único para esta combinación
+                const comboKey = `${reviewId}-${nota}`;
+
+                // Si la combinación ya existe en el Set, es un duplicado y lo ignoramos
+                if (uniqueCombos.has(comboKey)) {
+                    return false;
+                }
+
+                // Si es la primera vez que lo vemos, lo añadimos al Set y lo conservamos
+                uniqueCombos.add(comboKey);
+                return true;
+            });
+
             filteredReports = allReports;
             renderReports();
         } else {
@@ -58,7 +80,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             const avatar = reportedUser.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
             const date = new Date(report.created_at).toLocaleDateString('es-ES');
             const reviewComment = (report.review && report.review.comment) ? report.review.comment : 'Sin comentario de texto.';
-            const reportReason = report.nota || report.type_report;
+            const reportReason = report.type_report || 'Sin especificar';
+            const reportNota = report.nota || '';
 
             const cardHTML = `
                 <div class="card border border-light-subtle rounded-3 shadow-sm report-card">
@@ -72,22 +95,27 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 <div class="d-flex align-items-center mb-2 gap-2">
                                     <h5 class="mb-0 fw-bold user-name text-primary">${reportedUser}</h5>
                                     <span class="text-body-color" style="font-size: 0.9rem;">${date}</span>
-                                    <span class="badge rounded-pill px-3 py-1" style="background-color: #dc2626 !important; font-size: 0.75rem;">${report.type_report}</span>
                                 </div>
                                 <p class="text-dark mb-2 comment-text" style="font-size: 1rem; line-height: 1.4;">
                                     "${reviewComment}"
                                 </p>
                                 <p class="text-danger mb-0" style="font-size: 0.9rem; line-height: 1.4;">
-                                    <strong>Nota de reporte:</strong> ${reportReason}
+                                    <strong>Motivo de reporte:</strong> ${reportNota}
                                 </p>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-end gap-3 flex-shrink-0">
-                            <button type="button" class="btn bg-secondary text-primary fw-medium border px-3 btn-discard" data-id="${report.id}">
+                       <div class="d-flex justify-content-end gap-3 flex-shrink-0">
+                            <button type="button" class="btn bg-secondary border-0 fw-medium px-3 btn-discard text-dark" 
+                                    data-id="${report.id}" 
+                                    data-review-id="${report.review ? report.review.id : report.review_id}" 
+                                    data-nota="${reportNota}">
                                 Descartar reporte
                             </button>
-                            <button type="button" class="btn btn-accent text-white fw-medium px-3 btn-delete-report" data-id="${report.id}">
-                                Eliminar reporte
+                            <button type="button" class="btn btn-accent text-white fw-medium px-3 btn-delete-report" 
+                                    data-id="${report.id}" 
+                                    data-review-id="${report.review ? report.review.id : report.review_id}" 
+                                    data-nota="${reportNota}">
+                                Confirmar reporte
                             </button>
                         </div>
                     </div>
@@ -145,6 +173,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             e.preventDefault();
             const reportId = discardBtn.getAttribute('data-id');
 
+            // OBTENER ATRIBUTOS DE AGRUPACIÓN
+            const reviewId = discardBtn.getAttribute('data-review-id');
+            const nota = discardBtn.getAttribute('data-nota');
+
             Swal.fire({
                 title: '¿Descartar este reporte?',
                 text: "El reporte dejará de ser visible en esta lista.",
@@ -160,12 +192,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                     try {
                         const res = await window.api(`/admin/reports/${reportId}/status`, {
                             method: 'PATCH',
-                            body: JSON.stringify({ status: 'inactivo' })
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({ status: 'descartado' })
                         });
                         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                         await new Promise(resolve => setTimeout(resolve, 500));
-                        removeFromView(reportId);
+
+                        // LLAMADO A FUNCIÓN QUE BORRA EN LOTE DE RESEÑAS 
+                        removeGroupFromView(reviewId, nota, false);
 
                         Swal.fire({ icon: 'success', title: '¡Descartado!', showConfirmButton: false, timer: 1500 });
                     } catch (error) {
@@ -175,29 +210,37 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         }
 
-        // --- LÓGICA: ELIMINAR REPORTE FÍSICAMENTE ---
-        const deleteBtn = e.target.closest('.btn-delete-report');
-        if (deleteBtn) {
+        // --- LÓGICA: CONFIRMAR REPORTE (Ocultar reseña) ---
+        const confirmBtn = e.target.closest('.btn-delete-report');
+        if (confirmBtn) {
             e.preventDefault();
-            const reportId = deleteBtn.getAttribute('data-id');
+            const reportId = confirmBtn.getAttribute('data-id');
+
+            // OBTENER ATRIBUTOS DE AGRUPACIÓN
+            const reviewId = confirmBtn.getAttribute('data-review-id');
+            const nota = confirmBtn.getAttribute('data-nota');
 
             Swal.fire({
-                title: '¿Eliminar reporte permanentemente?',
-                text: "Esta acción borrará completamente el reporte de la base de datos. La reseña original no será afectada.",
-                icon: 'error',
+                title: '¿Confirmar este reporte?',
+                text: "La reseña original será ocultada y este reporte será confirmado.",
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'Sí, confirmar y ocultar',
                 cancelButtonText: 'Cancelar'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({ title: 'Eliminando...', text: 'Borrando registro...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    Swal.fire({ title: 'Procesando...', text: 'Actualizando registros...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                     try {
-                        // Petición DELETE directa al ID del reporte
-                        const res = await window.api(`/admin/reports/${reportId}`, {
-                            method: 'DELETE'
+                        const res = await window.api(`/admin/reports/${reportId}/status`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ status: 'confirmado' })
                         });
 
                         if (!res.ok) {
@@ -207,20 +250,33 @@ document.addEventListener('DOMContentLoaded', async function () {
                         }
 
                         await new Promise(resolve => setTimeout(resolve, 500));
-                        removeFromView(reportId);
 
-                        Swal.fire({ icon: 'success', title: '¡Eliminado!', text: 'El reporte fue borrado completamente.', showConfirmButton: false, timer: 1500 });
+                        // LLAMADO A LA FUNCIÓN QUE BORRA EN LOTE
+                        removeGroupFromView(reviewId, nota, true);
+
+                        Swal.fire({ icon: 'success', title: '¡Confirmado!', text: 'La reseña fue ocultada exitosamente.', showConfirmButton: false, timer: 1500 });
                     } catch (error) {
-                        Swal.fire({ icon: 'error', title: 'Error al eliminar', text: error.message });
+                        Swal.fire({ icon: 'error', title: 'Error al confirmar', text: error.message });
                     }
                 }
             });
         }
     });
 
-    // Función auxiliar para actualizar la memoria y la vista (reutilizable)
-    function removeFromView(reportId) {
-        allReports = allReports.filter(r => r.id != reportId);
+    function removeGroupFromView(reviewId, nota, isConfirmed) {
+        allReports = allReports.filter(r => {
+            const rReviewId = (r.review ? r.review.id : r.review_id).toString();
+            const rNota = r.nota || '';
+
+            if (isConfirmed) {
+                // Si se confirmó, eliminamos de la vista TODOS los reportes de esta reseña
+                return rReviewId !== reviewId.toString();
+            } else {
+                // Si se descartó, eliminamos solo los que coincidan en reseña + nota
+                const isMatch = (rReviewId === reviewId.toString() && rNota === nota);
+                return !isMatch;
+            }
+        });
 
         const filter = searchInput.value.toLowerCase();
         filteredReports = allReports.filter(report => {

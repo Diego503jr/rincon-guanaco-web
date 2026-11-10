@@ -65,6 +65,7 @@ class ReportController extends Controller
             ->groupBy('activities.destination_id');
 
         $ratings = DB::table('reviews')
+            ->where('status', 'activa')
             ->select('destination_id', DB::raw('AVG(rating) as rating'))
             ->groupBy('destination_id');
 
@@ -94,7 +95,7 @@ class ReportController extends Controller
                 'Total destinos'   => DB::table('destinations')->where('status', 'activo')->count(),
                 'Veces agregados'  => DB::table('itineraries_activities')->whereBetween('created_at', [$from, $to])->count(),
                 'Usuarios'         => User::where('role', 'user')->count(),
-                'Calificación'     => number_format((float) Review::avg('rating'), 1) . '/5',
+                'Calificación'     => number_format((float) Review::where('status', 'activa')->avg('rating'), 1) . '/5',
             ],
             'top'     => $top,
             'users'   => $users,

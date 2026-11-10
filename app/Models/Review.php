@@ -11,7 +11,8 @@ class Review extends Model
         'destination_id',
         'rating',
         'comment',
-        'travel_date'
+        'travel_date',
+        'status'
     ];
 
     // Relación con el usuario que escribió la reseña
@@ -24,5 +25,10 @@ class Review extends Model
     public function destination()
     {
         return $this->belongsTo(Destination::class, 'destination_id');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(ReportReview::class, 'review_id');
     }
 }

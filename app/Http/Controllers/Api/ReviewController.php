@@ -3,27 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+
 use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-
     public function index(Request $request)
     {
         $search = $request->query('search');
 
         $reviews = Review::with(['user', 'destination'])
+            // Solo mostrar reseñas activas para el usuario final
+            ->where('status', 'activa')
             ->when($search, function ($query, $search) {
-                $query->where('comment', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('destination', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
+                $query->where(function ($q) use ($search) {
+                    $q->where('comment', 'like', "%{$search}%")
+                      ->orWhereHas('user', function ($subQ) use ($search) {
+                          $subQ->where('name', 'like', "%{$search}%");
+                      })
+                      ->orWhereHas('destination', function ($subQ) use ($search) {
+                          $subQ->where('name', 'like', "%{$search}%");
+                      });
+                });
             })
-            // Cambia orderByDesc('created_at') por esto:
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -44,9 +47,13 @@ class ReviewController extends Controller
             'destination_id' => $validated['destination_id'],
             'rating'         => $validated['rating'],
             'travel_date'    => $validated['travel_date'],
-            'comment'        => $validated['comment'],
+            'comment'        => $validated['comment'] ?? null,
+            'status'         => 'activa', 
         ]);
 
-        return response()->json(['message' => 'Reseña creada', 'data' => $review], 201);
+        return response()->json([
+            'message' => 'Reseña creada', 
+            'data' => $review
+        ], 201);
     }
 }
