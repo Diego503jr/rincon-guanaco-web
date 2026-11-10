@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 return `
                 <tr>
-                    <td class="px-4 fw-bold text-secondary">#${String(act.id).padStart(3, "0")}</td>
+                    <td class="px-4 fw-bold">#${String(act.id).padStart(3, "0")}</td>
                     <td>
                         <div class="fw-bold text-dark">${esc(act.activity_name)}</div>
                         <div class="small text-muted text-truncate" style="max-width: 260px;">${esc(act.notes || "")}</div>

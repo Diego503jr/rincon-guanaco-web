@@ -18,13 +18,13 @@
     <!-- Pestañas de Navegación -->
     <ul class="nav nav-pills mb-4 gap-2">
         <li class="nav-item">
-            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.index') }}">Destinos</a>
+            <a class="nav-link bg-light px-4 fw-semibold" href="{{ route('admin.destinations.index') }}">Destinos</a>
         </li>
         <li class="nav-item">
             <a class="nav-link active text-white px-4 fw-semibold shadow-sm" style="background-color: #0D2A4D;" href="#">Actividades</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.accommodations') }}">Alojamientos</a>
+            <a class="nav-link bg-light px-4 fw-semibold" href="{{ route('admin.destinations.accommodations') }}">Alojamientos</a>
         </li>
     </ul>
 

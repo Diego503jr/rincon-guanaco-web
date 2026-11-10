@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
             : "Sin descripción";
 
         return `
-        <td class="px-3 fw-bold text-secondary">#${String(item.id).padStart(3, "0")}</td>
+        <td class="px-3 fw-bold">#${String(item.id).padStart(3, "0")}</td>
         <td>${imageTag}</td>
         <td>
             <div class="fw-bold text-dark">${item.name}</div>

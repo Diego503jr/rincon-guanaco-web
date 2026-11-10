@@ -44,7 +44,7 @@ const createAccRowHTML = (item) => {
         : `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill fw-semibold"><i class="bi bi-x-circle-fill me-1"></i> Inactivo</span>`;
 
     return `
-        <td class="px-3 fw-bold text-secondary">#${String(item.id).padStart(3, "0")}</td>
+        <td class="px-3 fw-bold">#${String(item.id).padStart(3, "0")}</td>
         <td>${imageTag}</td>
         <td>
             <div class="fw-bold text-dark">${item.name}</div>
@@ -52,7 +52,7 @@ const createAccRowHTML = (item) => {
         </td>
         <td class="text-muted small">
             <div><i class="bi bi-geo-alt text-danger me-1"></i>${locationStr}</div>
-            ${item.address ? `<small class="text-secondary d-truncate" style="max-width: 180px;" title="${item.address}">${item.address}</small>` : ""}
+            ${item.address ? `<small class="d-truncate" style="max-width: 180px;" title="${item.address}">${item.address}</small>` : ""}
         </td>
         <td>
             <span class="badge text-capitalize" style="background-color: #e2f9f1; color: #2A9D8F; border: 1px solid #c2e8e0; font-weight: 500;">

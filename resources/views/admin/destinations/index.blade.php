@@ -19,10 +19,10 @@
             <a class="nav-link active text-white px-4 fw-semibold shadow-sm" style="background-color: #0D2A4D;" href="#">Destinos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.activities') }}">Actividades</a>
+            <a class="nav-link bg-light px-4 fw-semibold" href="{{ route('admin.destinations.activities') }}">Actividades</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-secondary bg-light px-4 fw-semibold" href="{{ route('admin.destinations.accommodations') }}">Alojamientos</a>
+            <a class="nav-link bg-light px-4 fw-semibold" href="{{ route('admin.destinations.accommodations') }}">Alojamientos</a>
         </li>
     </ul>
 
@@ -49,7 +49,7 @@
                             <th class="py-3">Nombre</th>
                             <th class="py-3">Ubicación</th>
                             <th class="py-3">Categoría</th>
-                            <th>Tipo de Viajero</th>
+                            <th class="py-3">Tipo de Viajero</th>
                             <th class="py-3">Estado</th>
                             <th class="py-3 text-end px-4">Acciones</th>
                         </tr>
@@ -177,7 +177,7 @@
                         <!-- Columna Izquierda -->
                         <div class="col-12 col-md-6">
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Fotografía del destino *</label>
+                                <label class="form-label small fw-bold text-primary">Fotografía del destino *</label>
                                 <div class="border border-2 border-dashed rounded-4 p-4 text-center bg-light position-relative" style="cursor: pointer; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;" onclick="document.getElementById('edit_image_url').click()">
                                     <i class="bi bi-image fs-1 text-muted mb-2"></i>
                                     <span class="small text-muted d-block fw-semibold">Haz clic para cambiar la imagen</span>
@@ -187,19 +187,19 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Nombre del destino *</label>
+                                <label class="form-label small fw-bold text-primary">Nombre del destino *</label>
                                 <input type="text" id="edit_name" name="name" class="form-control" required>
                             </div>
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Departamento *</label>
+                                    <label class="form-label small fw-bold text-primary">Departamento *</label>
                                     <select id="edit_department" name="department" class="form-select" required>
                                         <option value="" disabled selected>Seleccionar...</option>
                                     </select>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Municipio *</label>
+                                    <label class="form-label small fw-bold text-primary">Municipio *</label>
                                     <select id="edit_municipality" name="municipality" class="form-select" required>
                                         <option value="" disabled selected>Seleccionar...</option>
                                     </select>
@@ -207,13 +207,13 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Descripción *</label>
+                                <label class="form-label small fw-bold text-primary">Descripción *</label>
                                 <textarea id="edit_description" name="description" class="form-control" rows="3" required></textarea>
                             </div>
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Categoría *</label>
+                                    <label class="form-label small fw-bold text-primary">Categoría *</label>
                                     <select id="edit_category" name="category" class="form-select" required>
                                         <option value="playa">Playa</option>
                                         <option value="montaña">Montaña</option>
@@ -224,7 +224,7 @@
                                     </select>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Tipo de viajero</label>
+                                    <label class="form-label small fw-bold text-primary">Tipo de viajero</label>
                                     <select id="edit_traveler_type" name="traveler_type" class="form-select">
                                         <option value="">Todos</option>
                                         <option value="mochilero">Mochilero</option>
@@ -236,7 +236,7 @@
 
                             <!-- Interruptor de Estado (Switch) -->
                             <div class="mb-2">
-                                <label class="form-label small fw-bold text-secondary d-block">Estado *</label>
+                                <label class="form-label small fw-bold text-primary d-block">Estado *</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" role="switch" id="edit_status_switch" checked onchange="document.getElementById('edit_status').value = this.checked ? 'activo' : 'inactivo'">
                                     <label class="form-check-label fw-semibold text-dark" for="edit_status_switch">Activo</label>
@@ -247,7 +247,7 @@
 
                         <!-- Columna Derecha (Mapa) -->
                         <div class="col-12 col-md-6 d-flex flex-column">
-                            <label class="form-label small fw-bold text-secondary">Ubicación *</label>
+                            <label class="form-label small fw-bold text-primary">Ubicación *</label>
                             <div id="editMap" class="rounded-4 border shadow-sm flex-grow-1 mb-2" style="min-height: 280px;"></div>
 
                             <div class="row g-2">
