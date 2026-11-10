@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ItineraryActivityController;
 use App\Http\Controllers\Api\ItineraryAccommodationController;
 use App\Http\Controllers\Api\AccommodationController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\SupportController;
 
 // Públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -95,4 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/users/{user}', [UserController::class, 'update']);
     Route::patch('/admin/users/{user}/status', [UserController::class, 'updateStatus']);
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy']);
+
+     //Soporte
+    Route::post('/support/message', [SupportController::class, 'sendSupportMessage']);
 });
