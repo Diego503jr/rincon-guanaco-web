@@ -55,7 +55,7 @@
                         </tr>
                     </thead>
                     <tbody id="destinationsTableBody">
-                        <!-- Creado dinámicamente desde index.js -->
+                        <!-- Creado dinámicamente desde destinations.js -->
                     </tbody>
                 </table>
             </div>
@@ -64,7 +64,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL: AGREGAR NUEVO DESTINO               -->
+<!-- MODAL: AGREGAR NUEVO DESTINO              -->
 <!-- ========================================== -->
 <div class="modal fade" id="createDestinationModal" tabindex="-1" aria-labelledby="createDestinationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -79,10 +79,10 @@
                         <!-- Columna Izquierda -->
                         <div class="col-12 col-md-6">
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Fotografía del destino *</label>
+                                <label class="form-label small fw-bold text-primary">Fotografía del destino *</label>
                                 <div class="border border-2 border-dashed rounded-4 p-4 text-center bg-light position-relative" style="cursor: pointer; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;" onclick="document.getElementById('image_url').click()">
                                     <i class="bi bi-image fs-1 text-muted mb-2"></i>
-                                    <span class="small text-muted d-block fw-semibold mb-1">Arrastra una imagen aquí o haz clic para seleccionar</span>
+                                    <span class="small text-muted d-block fw-semibold mb-1">Haz clic para agregar una imágen</span>
                                     <span class="text-muted" style="font-size: 0.75rem;">Formatos: JPG, PNG Máx. 5MB</span>
                                     <input type="file" id="image_url" name="image_url" class="d-none" accept="image/*" required>
                                 </div>
@@ -90,44 +90,33 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Nombre del destino *</label>
+                                <label class="form-label small fw-bold text-primary">Nombre del destino *</label>
                                 <input type="text" name="name" class="form-control" placeholder="Ej. El Tunco" required>
                             </div>
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Departamento *</label>
-                                    <select name="department" class="form-select" required>
+                                    <label class="form-label small fw-bold text-primary">Departamento *</label>
+                                    <select id="department" name="department" class="form-select" required>
                                         <option value="" disabled selected>Seleccionar...</option>
-                                        <option value="Sonsonate">Sonsonate</option>
-                                        <option value="San Salvador">San Salvador</option>
-                                        <option value="La Libertad">La Libertad</option>
-                                        <option value="Santa Ana">Santa Ana</option>
-                                        <option value="Chalatenango">Chalatenango</option>
-                                        <option value="Ahuachapán">Ahuachapán</option>
                                     </select>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Municipio *</label>
-                                    <select name="municipality" class="form-select" required>
+                                    <label class="form-label small fw-bold text-primary">Municipio *</label>
+                                    <select id="municipality" name="municipality" class="form-select" required>
                                         <option value="" disabled selected>Seleccionar...</option>
-                                        <option value="Izalco">Izalco</option>
-                                        <option value="San Jacinto">San Jacinto</option>
-                                        <option value="Tamanique">Tamanique</option>
-                                        <option value="San Ignacio">San Ignacio</option>
-                                        <option value="Ataco">Ataco</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Descripción *</label>
+                                <label class="form-label small fw-bold text-primary">Descripción *</label>
                                 <textarea name="description" class="form-control" rows="3" placeholder="Describe brevemente el destino..." required></textarea>
                             </div>
 
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Categoría *</label>
+                                    <label class="form-label small fw-bold text-primary">Categoría *</label>
                                     <select name="category" class="form-select" required>
                                         <option value="" disabled selected>Seleccionar...</option>
                                         <option value="playa">Playa</option>
@@ -139,7 +128,7 @@
                                     </select>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Tipo de viajero</label>
+                                    <label class="form-label small fw-bold text-primary">Tipo de viajero</label>
                                     <select name="traveler_type" class="form-select">
                                         <option value="" disabled selected>Seleccionar...</option>
                                         <option value="mochilero">Mochilero</option>
@@ -152,7 +141,7 @@
 
                         <!-- Columna Derecha (Mapa) -->
                         <div class="col-12 col-md-6 d-flex flex-column">
-                            <label class="form-label small fw-bold text-secondary">Ubicación *</label>
+                            <label class="form-label small fw-bold text-primary">Ubicación *</label>
                             <div id="createMap" class="rounded-4 border shadow-sm flex-grow-1 mb-2" style="min-height: 280px;"></div>
 
                             <div class="row g-2">
@@ -206,22 +195,13 @@
                                 <div class="col-6">
                                     <label class="form-label small fw-bold text-secondary">Departamento *</label>
                                     <select id="edit_department" name="department" class="form-select" required>
-                                        <option value="Sonsonate">Sonsonate</option>
-                                        <option value="San Salvador">San Salvador</option>
-                                        <option value="La Libertad">La Libertad</option>
-                                        <option value="Santa Ana">Santa Ana</option>
-                                        <option value="Chalatenango">Chalatenango</option>
-                                        <option value="Ahuachapán">Ahuachapán</option>
+                                        <option value="" disabled selected>Seleccionar...</option>
                                     </select>
                                 </div>
                                 <div class="col-6">
                                     <label class="form-label small fw-bold text-secondary">Municipio *</label>
                                     <select id="edit_municipality" name="municipality" class="form-select" required>
-                                        <option value="Izalco">Izalco</option>
-                                        <option value="San Jacinto">San Jacinto</option>
-                                        <option value="Tamanique">Tamanique</option>
-                                        <option value="San Ignacio">San Ignacio</option>
-                                        <option value="Ataco">Ataco</option>
+                                        <option value="" disabled selected>Seleccionar...</option>
                                     </select>
                                 </div>
                             </div>
@@ -287,5 +267,4 @@
 </div>
 @endsection
 
-@vite([
-'resources/js/destinations.js'])
+@vite(['resources/js/destinations.js'])

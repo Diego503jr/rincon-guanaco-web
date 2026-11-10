@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Destination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class DestinationController extends Controller
 {
@@ -18,7 +19,7 @@ class DestinationController extends Controller
         if ($request->has('category') && !empty($request->category)) {
             $query->where('category', $request->category);
         }
-        
+
         // Usamos $query en lugar de Destination para respetar el filtro anterior
         $destinations = $query->orderBy('id', 'asc')->get()->map(function ($destination) {
             if ($destination->image_url && !str_starts_with($destination->image_url, 'http')) {
@@ -49,8 +50,8 @@ class DestinationController extends Controller
             'name' => 'required|string|max:150',
             'category' => 'required|in:playa,montaña,cultural,gastronomico,aventura,relax',
             'traveler_type' => 'nullable|in:mochilero,familia,pareja',
-            'department' => 'required|in:Sonsonate,San Salvador',
-            'municipality' => 'required|in:Izalco,San Jacinto',
+            'department' => 'required|string|max:100', // <-- Actualizado
+            'municipality' => 'required|string|max:100', // <-- Actualizado
             'description' => 'nullable|string',
             'image_url' => 'nullable|image|max:5120',
             'latitude' => 'required|numeric',
@@ -79,12 +80,12 @@ class DestinationController extends Controller
             'name' => 'required|string|max:150',
             'category' => 'required|in:playa,montaña,cultural,gastronomico,aventura,relax',
             'traveler_type' => 'nullable|in:mochilero,familia,pareja',
-            'department' => 'required|in:Sonsonate,San Salvador',
-            'municipality' => 'required|in:Izalco,San Jacinto',
+            'department' => 'required|string|max:100', // <-- Actualizado
+            'municipality' => 'required|string|max:100', // <-- Actualizado
             'description' => 'nullable|string',
             'image_url' => 'nullable|image|max:5120',
-            'latitude' => 'required|numeric',   // <-- mapa de edición
-            'longitude' => 'required|numeric', // <-- mapa de edición
+            'latitude' => 'required|numeric',   
+            'longitude' => 'required|numeric', 
             'status' => 'required|in:activo,inactivo',
         ]);
 
@@ -137,5 +138,30 @@ class DestinationController extends Controller
         $visitedDestinations = $destinationsFromActivities->merge($destinationsFromAccommodations)->unique('id')->values();
 
         return response()->json($visitedDestinations);
+    }
+
+    // Obtener destino para sugerencias (cercanas)
+    public function getNearby(Request $request)
+    {
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+
+        if (!$latitude || !$longitude) {
+            return response()->json(['message' => 'Se requieren latitud y longitud'], 422);
+        }
+
+        $destinations = Destination::select('*', DB::raw("(
+        6371 * acos(
+            cos(radians(?)) * cos(radians(latitude)) * 
+            cos(radians(longitude) - radians(?)) + 
+            sin(radians(?)) * sin(radians(latitude))
+        )
+    ) AS distance"))
+            ->setBindings([$latitude, $longitude, $latitude])
+            ->orderBy('distance', 'asc')
+            ->limit(10)
+            ->get();
+
+        return response()->json($destinations);
     }
 }

@@ -3,6 +3,7 @@ window.L = L;
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import municipiosPorDepartamento from './data/el-salvador.json';
 
 import * as bootstrap from "bootstrap";
 window.bootstrap = bootstrap;
@@ -29,6 +30,56 @@ document.addEventListener("DOMContentLoaded", () => {
             }),
         });
     };
+
+    // ==========================================
+    // FUNCIÓN PARA LLENAR DEPARTAMENTOS INICIALES DESDE EL JSON
+    // ==========================================
+    function poblarDepartamentos(deptoId) {
+        const selectDepto = document.getElementById(deptoId);
+        if (!selectDepto) return;
+
+        // Limpiar y dejar la opción por defecto
+        selectDepto.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+
+        Object.keys(municipiosPorDepartamento).forEach(depto => {
+            const option = document.createElement("option");
+            option.value = depto;
+            option.textContent = depto;
+            selectDepto.appendChild(option);
+        });
+    }
+
+    // Poblar los selects de departamentos al cargar la página
+    poblarDepartamentos("department");
+    poblarDepartamentos("edit_department");
+
+    // ==========================================
+    // FUNCIÓN PARA SELECTS ANIDADOS (DEPARTAMENTO - MUNICIPIO)
+    // ==========================================
+    function setupDependentSelects(deptoId, muniId) {
+        const selectDepto = document.getElementById(deptoId);
+        const selectMuni = document.getElementById(muniId);
+
+        if (!selectDepto || !selectMuni) return;
+
+        selectDepto.addEventListener("change", function () {
+            const deptoSeleccionado = this.value;
+            selectMuni.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+
+            if (municipiosPorDepartamento[deptoSeleccionado]) {
+                municipiosPorDepartamento[deptoSeleccionado].forEach(municipio => {
+                    const option = document.createElement("option");
+                    option.value = municipio;
+                    option.textContent = municipio;
+                    selectMuni.appendChild(option);
+                });
+            }
+        });
+    }
+
+    // Inicializar la funcionalidad en los modales de Creación y Edición
+    setupDependentSelects("department", "municipality");
+    setupDependentSelects("edit_department", "edit_municipality");
 
     // Generar HTML de la fila de la tabla con todos los campos
     const createDestinationRowHTML = (item) => {
@@ -96,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </td>
     `;
     };
+
     // Función para renderizar la tabla dinámicamente
     function renderTable(items) {
         if (!tableBody) return;
@@ -284,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         previewContainer.querySelector(".fw-semibold");
                     if (previewText)
                         previewText.textContent =
-                            "Arrastra una imagen aquí o haz clic para seleccionar";
+                            "Haz clic para agregar una imagen";
                 }
 
                 Swal.fire({
@@ -328,10 +380,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("edit_destination_id").value =
                     dest.id || "";
                 document.getElementById("edit_name").value = dest.name || "";
-                document.getElementById("edit_department").value =
-                    dest.department || "";
-                document.getElementById("edit_municipality").value =
-                    dest.municipality || "";
+                
+                // Asignar departamento y poblar sus municipios correspondientes en el select de edición
+                const editDeptoSelect = document.getElementById("edit_department");
+                const editMuniSelect = document.getElementById("edit_municipality");
+                
+                editDeptoSelect.value = dest.department || "";
+                
+                // Rellenar municipios del departamento actual para que aparezca la lista correcta
+                editMuniSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+                if (municipiosPorDepartamento[dest.department]) {
+                    municipiosPorDepartamento[dest.department].forEach(municipio => {
+                        const option = document.createElement("option");
+                        option.value = municipio;
+                        option.textContent = municipio;
+                        if (municipio === dest.municipality) {
+                            option.selected = true;
+                        }
+                        editMuniSelect.appendChild(option);
+                    });
+                }
+                editMuniSelect.value = dest.municipality || "";
+
                 document.getElementById("edit_description").value =
                     dest.description || "";
                 document.getElementById("edit_latitude").value =

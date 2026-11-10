@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/destinations', [DestinationController::class, 'store']);
     Route::post('/admin/destinations/{id}', [DestinationController::class, 'update']); // Usando POST con _method si se envían archivos multipart/form-data
     Route::delete('/admin/destinations/{id}', [DestinationController::class, 'destroy']); //Eliminado lógico
+    Route::get('/destinations/nearby', [DestinationController::class, 'getNearby']);
 
     // Alojamientos 
     Route::get('/admin/accommodations', [AccommodationController::class, 'index']);

@@ -262,7 +262,7 @@ if (createAccForm) {
                 const txt = createContainer.querySelector(".fw-semibold");
                 if (txt)
                     txt.textContent =
-                        "Arrastra una imagen aquí o haz clic para seleccionar";
+                        "Haz clic para agregar una imagen";
             }
 
             Swal.fire({
