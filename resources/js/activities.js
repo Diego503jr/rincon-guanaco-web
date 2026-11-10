@@ -119,8 +119,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                     : `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fw-semibold"><i class="bi bi-x-circle-fill me-1"></i> Inactivo</span>`;
 
                 const deleteBtn = isActive
-                    ? `<button class="btn btn-sm btn-light border btn-delete" data-id="${act.id}" title="Desactivar">
-                        <i class="bi bi-trash text-danger"></i>
+                    ? `<button class="btn btn-sm p-1 btn-delete border-0 bg-transparent shadow-none" data-id="${act.id}" title="Desactivar" style="color: #f2994a !important;">
+                        <i class="bi bi-trash fs-5"></i>
                    </button>`
                     : "";
 
@@ -136,9 +136,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <td class="text-muted"><i class="bi bi-people me-1"></i>${act.people}</td>
                     <td class="text-muted"><i class="bi bi-clock me-1"></i>${formatDuration(act.duracion)}</td>
                     <td>${statusBadge}</td>
-                    <td class="text-end px-4 text-nowrap">
-                        <button class="btn btn-sm btn-light border me-1 btn-edit" data-id="${act.id}" title="Editar">
-                            <i class="bi bi-pencil text-primary"></i>
+                    <td class="text-end px-3 text-nowrap">
+                        <button class="btn btn-sm p-1 me-1 btn-edit border-0 bg-transparent shadow-none" data-id="${act.id}" title="Editar" style="color: #0D2A4D !important;">
+                            <i class="bi bi-pencil fs-5"></i>
                         </button>
                         ${deleteBtn}
                     </td>
