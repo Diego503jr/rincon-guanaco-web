@@ -71,28 +71,28 @@
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Fotografía del alojamiento *</label>
+                                <label class="form-label small fw-bold text-primary">Fotografía del alojamiento *</label>
                                 <div class="border border-2 border-dashed rounded-4 p-4 text-center bg-light position-relative" style="cursor: pointer; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;" onclick="document.getElementById('acc_image_url').click()">
                                     <i class="bi bi-image fs-1 text-muted mb-2"></i>
-                                    <span class="small text-muted d-block fw-semibold mb-1">Arrastra una imagen aquí o haz clic para seleccionar</span>
+                                    <span class="small text-muted d-block fw-semibold mb-1">Haz clic para agregar una imágen</span>
                                     <input type="file" id="acc_image_url" name="image_url" class="d-none" accept="image/*">
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Destino asociado *</label>
+                                <label class="form-label small fw-bold text-primary">Destino asociado *</label>
                                 <select id="create_acc_destination_id" name="destination_id" class="form-select" required>
-                                    <option value="" disabled selected>Selecciona un destino...</option>
+                                    <option value="" disabled selected>Busca y selecciona un destino...</option>
                                 </select>
                             </div>
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Número de reservas</label>
+                                    <label class="form-label small fw-bold text-primary">Número de reservas</label>
                                     <input type="number" name="reserva" class="form-control" placeholder="Ej. 3">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Precio por noche *</label>
+                                    <label class="form-label small fw-bold text-primary">Precio por noche *</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light border-end-0">$</span>
                                         <input type="number" step="0.01" name="price" class="form-control border-start-0" required>
@@ -103,28 +103,28 @@
 
                         <div class="col-12 col-md-6">
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Nombre del alojamiento *</label>
+                                <label class="form-label small fw-bold text-primary">Nombre del alojamiento *</label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Dirección</label>
+                                <label class="form-label small fw-bold text-primary">Dirección</label>
                                 <input type="text" name="address" class="form-control">
                             </div>
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Teléfono</label>
+                                    <label class="form-label small fw-bold text-primary">Teléfono</label>
                                     <input type="text" name="contact_phone" class="form-control">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Correo</label>
+                                    <label class="form-label small fw-bold text-primary">Correo</label>
                                     <input type="email" name="email" class="form-control">
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Tipo de alojamiento *</label>
+                                <label class="form-label small fw-bold text-primary">Tipo de alojamiento *</label>
                                 <select name="type" class="form-select" required>
                                     <option value="" disabled selected>Seleccionar...</option>
                                     <option value="hotel">Hotel</option>
@@ -135,11 +135,11 @@
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Hora de entrada *</label>
+                                    <label class="form-label small fw-bold text-primary">Hora de entrada *</label>
                                     <input type="time" name="check_in" class="form-control" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small fw-bold text-secondary">Hora de salida *</label>
+                                    <label class="form-label small fw-bold text-primary">Hora de salida *</label>
                                     <input type="time" name="check_out" class="form-control" required>
                                 </div>
                             </div>
@@ -179,7 +179,9 @@
 
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-secondary">Destino asociado *</label>
-                                <select id="edit_acc_destination_id" name="destination_id" class="form-select" required></select>
+                                <select id="edit_acc_destination_id" name="destination_id" class="form-select" required>
+                                    <option value="" disabled selected>Busca y selecciona un destino...</option>
+                                </select>
                             </div>
 
                             <div class="row g-2 mb-3">
@@ -260,5 +262,4 @@
 </div>
 @endsection
 
-@vite([
-'resources/js/accommodations.js'])
+@vite(['resources/js/accommodations.js'])
