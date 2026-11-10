@@ -57,7 +57,7 @@
                             <th class="py-3">Personas</th>
                             <th class="py-3">Duración</th>
                             <th class="py-3">Estado</th>
-                            <th class="py-3 text-end px-4">Acciones</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="activitiesTableBody">
@@ -89,13 +89,13 @@
                     <input type="hidden" id="activity_id">
                     <div class="modal-body px-4 py-3">
                         <div class="mb-3">
-                            <label for="activity_name" class="form-label small fw-bold text-secondary">Nombre de la actividad *</label>
+                            <label for="activity_name" class="form-label small fw-bold text-primary">Nombre de la actividad *</label>
                             <input type="text" id="activity_name" name="activity_name" class="form-control" maxlength="150"
                                 placeholder="Ej. Ascenso guiado al volcán" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="destination_id" class="form-label small fw-bold text-secondary">Destino *</label>
+                            <label for="destination_id" class="form-label small fw-bold text-primary">Destino *</label>
                             <select id="destination_id" name="destination_id" class="form-select" required>
                                 <option value="" disabled selected>Seleccionar...</option>
                             </select>
@@ -103,30 +103,30 @@
 
                         <div class="row g-2 mb-3">
                             <div class="col-4">
-                                <label for="price" class="form-label small fw-bold text-secondary">Precio ($) *</label>
+                                <label for="price" class="form-label small fw-bold text-primary">Precio ($) *</label>
                                 <input type="number" id="price" name="price" class="form-control" min="0" step="0.01"
                                     placeholder="0.00" required>
                             </div>
                             <div class="col-4">
-                                <label for="people" class="form-label small fw-bold text-secondary">Personas *</label>
+                                <label for="people" class="form-label small fw-bold text-primary">Personas *</label>
                                 <input type="number" id="people" name="people" class="form-control" min="1" step="1"
                                     value="1" required>
                             </div>
                             <div class="col-4">
-                                <label for="duracion" class="form-label small fw-bold text-secondary">Duración *</label>
+                                <label for="duracion" class="form-label small fw-bold text-primary">Duración *</label>
                                 <input type="time" id="duracion" name="duracion" class="form-control" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="notes" class="form-label small fw-bold text-secondary">Notas</label>
+                            <label for="notes" class="form-label small fw-bold text-primary">Notas</label>
                             <textarea id="notes" name="notes" class="form-control" rows="3"
                                 placeholder="Recomendaciones para el turista..."></textarea>
                         </div>
 
                         <!-- Interruptor de Estado (solo al editar, igual que en Destinos) -->
                         <div id="statusGroup" class="mb-1 d-none">
-                            <label class="form-label small fw-bold text-secondary d-block">Estado *</label>
+                            <label class="form-label small fw-bold text-primary d-block">Estado *</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="status_switch" checked>
                                 <label class="form-check-label fw-semibold text-dark" for="status_switch" id="statusLabel">Activo</label>
