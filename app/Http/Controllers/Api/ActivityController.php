@@ -73,6 +73,7 @@ class ActivityController extends Controller
     public function getByDestination(int $destinationId)
     {
         $activities = Activity::where('destination_id', $destinationId)
+            ->where('status', 'activo') 
             ->orderBy('created_at', 'desc')
             ->get();
 
